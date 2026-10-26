@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>露营助手 · 车象 WeatherOS</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="pages.css">
+</head>
+<body data-page="camping">
+  <aside class="rail">
+    <a class="brand" href="index.html" aria-label="车象 WeatherOS 首页">
+      <span class="logo-glyph" data-icon="cloud-lightning"></span><sup>°</sup>
+    </a>
+    <nav class="rail-nav" aria-label="主导航">
+      <a class="nav-item" data-nav="home" href="index.html" title="气象看板">
+        <span class="ni-icon" data-icon="layout-dashboard"></span><span class="ni-label">气象</span>
+      </a>
+      <a class="nav-item" data-nav="rainstorm" href="rainstorm.html" title="高速暴雨辅助">
+        <span class="ni-icon" data-icon="cloud-rain"></span><span class="ni-label">暴雨</span>
+      </a>
+      <a class="nav-item" data-nav="camping" href="camping.html" title="露营助手">
+        <span class="ni-icon" data-icon="tent"></span><span class="ni-label">露营</span>
+      </a>
+      <a class="nav-item" data-nav="flood" href="flood.html" title="山洪预警">
+        <span class="ni-icon" data-icon="mountain"></span><span class="ni-label">山洪</span>
+      </a>
+      <a class="nav-item" data-nav="fishing" href="fishing.html" title="钓鱼窗口">
+        <span class="ni-icon" data-icon="fish"></span><span class="ni-label">钓鱼</span>
+      </a>
+    </nav>
+    <div class="rail-foot">
+      <span class="sys"><span class="sys-dot"></span>SYS OK</span>
+      <span class="ver">DEMO v0.9</span>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <div class="tb-title">车象<span class="crumb">WEATHER OS</span></div>
+      <div class="tb-chips">
+        <span class="chip"><span class="chip-ic" data-icon="navigation"></span>G60 沪昆高速 · 嘉兴段</span>
+        <span class="chip"><span class="chip-ic" data-icon="car"></span>ACC <span class="chip-val">ON</span></span>
+        <span class="chip"><span class="chip-ic" data-icon="droplets"></span>传感器 <span class="chip-val">4/4</span></span>
+        <span class="chip"><span class="chip-ic" data-icon="thermometer"></span>车内 <span class="chip-val">22.5°</span></span>
+        <span class="chip"><span class="chip-ic" data-icon="wifi"></span>5G</span>
+      </div>
+      <div class="tb-clock"><span id="tbClock" class="mono">14:32:08</span><span id="tbDate" class="tb-date">10月26日 · 周日</span></div>
+    </header>
+
+    <main class="content">
+      <section class="page-head stagger">
+        <div class="ph-main">
+          <span class="eyebrow">03 / 目的地气象</span>
+          <h1 class="page-title">露营助手</h1>
+          <p class="page-sub">与高德地图联动 · 设定目的地后自动获取到达时刻天气与露营建议</p>
+        </div>
+        <div class="head-actions">
+          <span class="tag tag-ok"><span class="live-dot"></span>高德地图已连接</span>
+          <span class="status-pill" id="campStatus"><span data-icon="route"></span><span id="campStatusText">目的地：莫干山云起营地</span></span>
+        </div>
+      </section>
+
+      <div class="grid g-7-5 camping-grid stagger">
+        <article class="card map-card">
+          <div class="map-head">
+            <div class="card-head">
+              <span class="ch-ic" data-icon="map"></span>
+              <h3>路线预览</h3>
+            </div>
+            <span class="map-provider"><span data-icon="navigation"></span>高德地图 · 实时路况</span>
+          </div>
+          <div class="map-canvas">
+            <svg class="map-art" id="mapArt" viewBox="0 0 800 520" preserveAspectRatio="xMidYMid slice" aria-label="目的地路线示意地图">
+              <defs>
+                <pattern id="cwGrid" width="46" height="46" patternUnits="userSpaceOnUse">
+                  <path d="M46 0H0V46" fill="none" stroke="rgba(148,180,204,.055)" stroke-width="1"></path>
+                </pattern>
+                <linearGradient id="cwRoute" x1="0" y1="1" x2="1" y2="0">
+                  <stop offset="0" stop-color="#2FD9C0"></stop>
+                  <stop offset="1" stop-color="#59B7FF"></stop>
+                </linearGradient>
+                <filter id="cwGlow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="3.2" result="blur"></feGaussianBlur>
+                  <feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+                </filter>
+              </defs>
+              <rect width="800" height="520" fill="#08121A"></rect>
+              <rect width="800" height="520" fill="url(#cwGrid)"></rect>
+
+              <path d="M-20 130 C62 78 150 112 214 84 C286 52 360 118 330 178 C300 238 172 232 96 252 C26 270 -20 210 -20 130Z" fill="#0C1D18" stroke="#18332A"></path>
+              <path d="M596 300 C660 234 746 250 820 292 L820 520 L510 520 C486 432 534 352 596 300Z" fill="#0C1D18" stroke="#18332A"></path>
+              <path d="M20 162 C84 130 146 154 190 132" fill="none" stroke="#1C3B31" stroke-width="1"></path>
+              <path d="M46 196 C112 164 174 188 220 164" fill="none" stroke="#18352C" stroke-width="1"></path>
+              <path d="M64 226 C130 196 188 218 240 194" fill="none" stroke="#18352C" stroke-width="1"></path>
+              <path d="M560 382 C620 342 700 350 760 330" fill="none" stroke="#1C3B31" stroke-width="1"></path>
+              <path d="M580 428 C646 388 714 398 780 378" fill="none" stroke="#18352C" stroke-width="1"></path>
+
+              <path d="M30 392 C104 352 180 368 208 408 C236 456 146 506 84 494 C22 482 -4 430 30 392Z" fill="#08222E" stroke="#123B4A"></path>
+              <path d="M46 412 C92 390 140 400 160 424" fill="none" stroke="#14455A" stroke-width="1"></path>
+
+              <path d="M-20 470 C150 420 250 442 352 382 C468 314 520 208 642 158 C712 130 782 148 820 118" fill="none" stroke="#17262F" stroke-width="20" stroke-linecap="round"></path>
+              <path d="M-20 470 C150 420 250 442 352 382 C468 314 520 208 642 158 C712 130 782 148 820 118" fill="none" stroke="#3B586B" stroke-width="1.4" stroke-dasharray="12 14"></path>
+              <path d="M282 530 C318 438 414 398 468 328 C520 260 540 208 602 178" fill="none" stroke="#1D303B" stroke-width="8" stroke-linecap="round"></path>
+              <path d="M120 340 C236 318 328 330 430 300" fill="none" stroke="#1D303B" stroke-width="6" stroke-linecap="round"></path>
+
+              <path d="M120 432 C232 402 300 380 380 350 C472 316 524 250 612 192" fill="none" stroke="url(#cwRoute)" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round" filter="url(#cwGlow)"></path>
+
+              <circle cx="120" cy="432" r="22" fill="rgba(47,217,192,.12)"></circle>
+              <circle cx="120" cy="432" r="8" fill="#2FD9C0" stroke="#071219" stroke-width="2"></circle>
+              <circle cx="120" cy="432" r="3" fill="#ffffff"></circle>
+              <text x="144" y="437" fill="#A9C3D6" font-size="11">当前位置</text>
+
+              <g transform="translate(612 192)">
+                <circle r="30" fill="rgba(255,179,92,.10)"></circle>
+                <circle r="18" fill="none" stroke="rgba(255,179,92,.4)" stroke-dasharray="2 3"></circle>
+                <path d="M0 -4 C-10 -18 -13 -24 -13 -30 A13 13 0 1 1 13 -30 C13 -24 10 -18 0 -4Z" transform="translate(0 8)" fill="#FFB35C" stroke="#0B1720" stroke-width="2"></path>
+                <circle cy="-30" r="4.5" fill="#0B1720"></circle>
+              </g>
+              <text id="mapDestLabel" x="640" y="168" fill="#FFD7A6" font-size="12">莫干山云起营地</text>
+              <text x="640" y="184" fill="#7C94A7" font-size="9.5">海拔 420 m · 营地</text>
+
+              <text x="360" y="452" fill="#5E7689" font-size="9" transform="rotate(-14 360 452)">S304</text>
+              <text x="470" y="300" fill="#5E7689" font-size="9" transform="rotate(-28 470 300)">G25 长深高速</text>
+              <text x="118" y="300" fill="#3F6B57" font-size="10" letter-spacing="2">莫干山风景区</text>
+              <text x="46" y="472" fill="#2E6478" font-size="9">对河口水库</text>
+
+              <g transform="translate(760 40)">
+                <path d="M0 16 L0 -8 M0 -8 L-5 0 M0 -8 L5 0" fill="none" stroke="#93A7B8" stroke-width="1.2"></path>
+                <text x="-3" y="27" fill="#93A7B8" font-size="8">N</text>
+              </g>
+            </svg>
+            <span class="map-scale">1 km</span>
+            <span class="map-chip map-dest"><span data-icon="flag"></span><span id="mapDestChip">莫干山云起营地</span></span>
+            <span class="map-chip map-dist"><span data-icon="route"></span><span id="mapDistance">68 km</span> · <span id="mapDuration">1 小时 12 分</span></span>
+            <div class="map-zoom">
+              <button id="zoomIn" type="button" aria-label="放大地图"><span data-icon="plus"></span></button>
+              <button id="zoomOut" type="button" aria-label="缩小地图"><span data-icon="minus"></span></button>
+            </div>
+            <span class="map-watermark">高德地图 · 示意</span>
+          </div>
+        </article>
+
+        <div class="camp-side">
+          <article class="card plan-card">
+            <div class="card-head">
+              <span class="ch-ic" data-icon="search"></span>
+              <h3>设定目的地</h3>
+              <span class="ch-tag tag tag-ok" id="planProvider">高德已同步</span>
+            </div>
+            <div class="search-row">
+              <div class="search-box" id="searchBox">
+                <span data-icon="search"></span>
+                <input class="dest-input" id="destInput" value="莫干山云起营地" placeholder="搜索目的地 / 营地" aria-label="搜索目的地" autocomplete="off">
+              </div>
+              <button class="btn" id="planBtn" type="button">设定<span data-icon="arrow-up-right"></span></button>
+            </div>
+            <p class="field-error" id="destError"></p>
+            <div class="quick-chips" id="destChips"></div>
+            <div class="plan-meta"><span data-icon="route"></span><span id="routeMeta">68 km · 1 小时 12 分 · 预计 16:20 到达</span></div>
+          </article>
+
+          <article class="card arrival-card" id="arrivalCard">
+            <div class="arrival-head">
+              <div>
+                <span class="eyebrow">ARRIVAL WEATHER</span>
+                <h3>到达天气</h3>
+              </div>
+              <span class="tag tag-warn" id="arrBadge">雷雨</span>
+            </div>
+            <div class="arrival-main">
+              <div class="arrival-temp"><span class="num-xl" id="arrTemp">18</span><span>°C</span></div>
+              <div class="arrival-desc">
+                <div id="arrCond">雷阵雨</div>
+                <span id="arrArrival">预计 16:20 到达</span>
+              </div>
+              <div class="arrival-ic" id="arrIcon" data-icon="cloud-lightning"></div>
+            </div>
+            <div class="arrival-grid">
+              <div><span>降水概率</span><b id="arrRain">80%</b></div>
+              <div><span>风速</span><b id="arrWind">15 km/h</b></div>
+              <div><span>气压</span><b id="arrPressure">1006 hPa</b></div>
+              <div><span>能见度</span><b id="arrVis">4.0 km</b></div>
+            </div>
+            <div class="arrival-note">
+              <span data-icon="umbrella"></span>
+              <p id="arrNote">到达前 1 小时有雷阵雨，营地地面湿滑，建议延后扎营或选择有遮蔽的营位。</p>
+            </div>
+            <div class="hourly" id="arrHourly"></div>
+            <div class="arrival-loading" id="arrivalLoading" hidden>
+              <span class="loader"><span></span><span></span><span></span></span>
+              <span>正在同步高德路线与目的地天气…</span>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <article class="card camp-advice stagger">
+        <div class="card-head">
+          <span class="ch-ic" data-icon="leaf"></span>
+          <h3>露营建议</h3>
+          <span class="ch-tag tag tag-dim" id="adviceDest">莫干山云起营地</span>
+        </div>
+        <div class="advice-grid">
+          <div class="advice-block">
+            <div class="ab-head"><span data-icon="thermometer"></span>营地舒适度</div>
+            <div class="ab-main" id="comfortScore">58<small>/ 100 · 一般</small></div>
+            <p class="ab-text" id="comfortText">降雨影响体感，建议延后扎营或选择有遮蔽的营位。</p>
+          </div>
+          <div class="advice-block">
+            <div class="ab-head"><span data-icon="umbrella"></span>装备建议</div>
+            <div class="ab-chips" id="gearChips"></div>
+            <p class="ab-text">到达前 1 小时有雷阵雨，优先搭建天幕再扎帐。</p>
+          </div>
+          <div class="advice-block">
+            <div class="ab-head"><span data-icon="alert-triangle"></span>安全提示</div>
+            <div class="ab-main" id="safetyMain" style="font-size:14px">雷雨 · 阵风 5 级</div>
+            <p class="ab-text" id="safetyText">避开孤立大树与溪谷低洼营位；雷暴期间停止使用金属杆帐。</p>
+          </div>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <script src="icons.js"></script>
+  <script src="mock.js"></script>
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+  <script src="pages/camping.js"></script>
+</body>
+</html>

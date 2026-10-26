@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>高速暴雨辅助 · 车象 WeatherOS</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="pages.css">
+</head>
+<body data-page="rainstorm">
+  <aside class="rail">
+    <a class="brand" href="index.html" aria-label="车象 WeatherOS 首页">
+      <span class="logo-glyph" data-icon="cloud-lightning"></span><sup>°</sup>
+    </a>
+    <nav class="rail-nav" aria-label="主导航">
+      <a class="nav-item" data-nav="home" href="index.html" title="气象看板">
+        <span class="ni-icon" data-icon="layout-dashboard"></span><span class="ni-label">气象</span>
+      </a>
+      <a class="nav-item" data-nav="rainstorm" href="rainstorm.html" title="高速暴雨辅助">
+        <span class="ni-icon" data-icon="cloud-rain"></span><span class="ni-label">暴雨</span>
+      </a>
+      <a class="nav-item" data-nav="camping" href="camping.html" title="露营助手">
+        <span class="ni-icon" data-icon="tent"></span><span class="ni-label">露营</span>
+      </a>
+      <a class="nav-item" data-nav="flood" href="flood.html" title="山洪预警">
+        <span class="ni-icon" data-icon="mountain"></span><span class="ni-label">山洪</span>
+      </a>
+      <a class="nav-item" data-nav="fishing" href="fishing.html" title="钓鱼窗口">
+        <span class="ni-icon" data-icon="fish"></span><span class="ni-label">钓鱼</span>
+      </a>
+    </nav>
+    <div class="rail-foot">
+      <span class="sys"><span class="sys-dot"></span>SYS OK</span>
+      <span class="ver">DEMO v0.9</span>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <div class="tb-title">车象<span class="crumb">WEATHER OS</span></div>
+      <div class="tb-chips">
+        <span class="chip"><span class="chip-ic" data-icon="navigation"></span>G60 沪昆高速 · 嘉兴段</span>
+        <span class="chip"><span class="chip-ic" data-icon="car"></span>ACC <span class="chip-val">ON</span></span>
+        <span class="chip"><span class="chip-ic" data-icon="droplets"></span>传感器 <span class="chip-val">4/4</span></span>
+        <span class="chip"><span class="chip-ic" data-icon="thermometer"></span>车内 <span class="chip-val">22.5°</span></span>
+        <span class="chip"><span class="chip-ic" data-icon="wifi"></span>5G</span>
+      </div>
+      <div class="tb-clock"><span id="tbClock" class="mono">14:32:08</span><span id="tbDate" class="tb-date">10月26日 · 周日</span></div>
+    </header>
+
+    <main class="content">
+      <section class="page-head stagger">
+        <div class="ph-main">
+          <span class="eyebrow">02 / 自适应驾驶</span>
+          <h1 class="page-title">高速暴雨辅助</h1>
+          <p class="page-sub">雨量传感器 → 目标车速 / 跟车距离自动联动 · RS-04 · 采样 1 Hz</p>
+        </div>
+        <div class="head-actions">
+          <span class="status-pill is-off" id="assistStatusPill"><span class="live-dot"></span><span id="assistStatusText">辅助待命</span></span>
+          <span class="tag tag-ok"><span class="live-dot"></span>传感器在线</span>
+        </div>
+      </section>
+
+      <div class="grid g-4-4-4 rs-grid stagger">
+        <article class="card sensor-card">
+          <div class="card-head">
+            <span class="ch-ic" data-icon="droplets"></span>
+            <h3>雨量传感器 RS-04</h3>
+            <span class="ch-tag tag tag-ok"><span class="live-dot"></span>在线</span>
+          </div>
+          <div class="sensor-big">
+            <span class="num-xl" id="rsRate">12.6</span>
+            <span class="unit">mm/h</span>
+            <span class="level-pill lv-heavy" id="rsLevel">大雨</span>
+          </div>
+          <div class="sensor-scale" id="rsScale"></div>
+          <div class="sensor-mini">
+            <div><span>近 10 分钟</span><b id="rsDelta">+3.2 mm</b></div>
+            <div><span>累计雨量</span><b id="rsTotal">18.4 mm</b></div>
+            <div><span>暴雨阈值</span><b class="dim">16 mm/h</b></div>
+          </div>
+          <div class="chart-head"><span>近 60 分钟雨量趋势</span><span>mm/h</span></div>
+          <svg class="line-chart" id="rainLine" viewBox="0 0 320 90" preserveAspectRatio="none" aria-label="近 60 分钟雨量趋势"></svg>
+          <div class="chart-axis"><span>-60 min</span><span>-30</span><span>现在</span></div>
+        </article>
+
+        <article class="card assist-card" id="assistCard">
+          <div class="assist-head">
+            <div>
+              <span class="eyebrow">RAIN PILOT</span>
+              <h3>暴雨辅助</h3>
+            </div>
+            <div class="switch" id="assistSwitch" role="switch" aria-checked="false" tabindex="0" aria-label="暴雨辅助开关"><span class="knob"></span></div>
+          </div>
+          <p class="assist-desc">开启后，车机根据实时雨量自动下调目标车速、扩大跟车距离，并同步 ACC 与制动预充压。</p>
+          <div class="assist-state">
+            <span class="as-dot"></span>
+            <b id="assistState">辅助待命</b>
+            <span id="assistHint">雨量达到大雨阈值，可开启辅助</span>
+          </div>
+          <div class="assist-values">
+            <div class="av-item">
+              <span>目标车速</span>
+              <b><span id="avSpeed">100</span><small>km/h</small></b>
+              <em id="avSpeedNote">当前限速</em>
+            </div>
+            <div class="av-item">
+              <span>跟车距离</span>
+              <b><span id="avGap">2.0</span><small>s</small></b>
+              <em id="avGapNote">手动模式</em>
+            </div>
+          </div>
+          <div class="assist-log" id="assistLog">RS-04 · 最近同步 14:32:08</div>
+        </article>
+
+        <article class="card speed-card">
+          <div class="card-head">
+            <span class="ch-ic" data-icon="car"></span>
+            <h3>实时车辆状态</h3>
+            <span class="ch-tag tag tag-info">ACC 激活</span>
+          </div>
+          <div class="speed-wrap">
+            <svg class="speed-gauge" viewBox="0 0 200 112" aria-label="当前车速">
+              <defs>
+                <linearGradient id="sgGrad" x1="0" y1="1" x2="1" y2="0">
+                  <stop offset="0" stop-color="#2FD9C0"></stop>
+                  <stop offset="1" stop-color="#59B7FF"></stop>
+                </linearGradient>
+              </defs>
+              <path class="sg-track" d="M20 100a80 80 0 0 1 160 0" pathLength="100"></path>
+              <path class="sg-fill" id="speedArc" d="M20 100a80 80 0 0 1 160 0" pathLength="100" stroke-dasharray="80 100"></path>
+              <text class="sg-tick-label" x="14" y="112">0</text>
+              <text class="sg-tick-label" x="93" y="12">60</text>
+              <text class="sg-tick-label" x="176" y="112">120</text>
+            </svg>
+            <div class="speed-num"><b class="mono" id="speedVal">96</b><span>km/h</span><em>当前车速</em></div>
+            <div class="speed-limit"><span>限速</span><b class="mono" id="speedLimit">100</b></div>
+          </div>
+          <div class="live-rows">
+            <div><span>ACC 自适应巡航</span><b class="ok">已激活</b></div>
+            <div><span>实际跟车</span><b class="mono" id="followVal">62 m · 2.3 s</b></div>
+            <div><span>车道保持</span><b>居中</b></div>
+          </div>
+          <div class="gap-visual" aria-label="跟车距离示意">
+            <span class="car-ic" data-icon="car"></span>
+            <span class="gap-line"><em id="gapMeters">62 m</em></span>
+            <span class="car-ic front" data-icon="car"></span>
+          </div>
+        </article>
+      </div>
+
+      <div class="grid g-7-5 stagger" style="margin-top:16px">
+        <article class="card logic-card">
+          <div class="card-head">
+            <span class="ch-ic" data-icon="sliders-horizontal"></span>
+            <h3>分级响应逻辑</h3>
+            <span class="ch-tag tag tag-warn">当前：大雨档</span>
+          </div>
+          <div class="logic-table" id="logicTable"></div>
+          <p class="logic-note">阈值与策略可由车队管理后台配置；当前按“大雨”档执行，辅助介入需驾驶员确认开启。</p>
+        </article>
+
+        <article class="card event-card">
+          <div class="card-head">
+            <span class="ch-ic" data-icon="history"></span>
+            <h3>事件记录</h3>
+            <span class="ch-tag tag tag-dim">最近 1 小时</span>
+          </div>
+          <ul class="timeline" id="eventList"></ul>
+        </article>
+      </div>
+    </main>
+  </div>
+
+  <script src="icons.js"></script>
+  <script src="mock.js"></script>
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+  <script src="pages/rainstorm.js"></script>
+</body>
+</html>

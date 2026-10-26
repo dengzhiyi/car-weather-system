@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>钓鱼窗口 · 车象 WeatherOS</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="pages.css">
+</head>
+<body data-page="fishing">
+  <aside class="rail">
+    <a class="brand" href="index.html" aria-label="车象 WeatherOS 首页">
+      <span class="logo-glyph" data-icon="cloud-lightning"></span><sup>°</sup>
+    </a>
+    <nav class="rail-nav" aria-label="主导航">
+      <a class="nav-item" data-nav="home" href="index.html" title="气象看板">
+        <span class="ni-icon" data-icon="layout-dashboard"></span><span class="ni-label">气象</span>
+      </a>
+      <a class="nav-item" data-nav="rainstorm" href="rainstorm.html" title="高速暴雨辅助">
+        <span class="ni-icon" data-icon="cloud-rain"></span><span class="ni-label">暴雨</span>
+      </a>
+      <a class="nav-item" data-nav="camping" href="camping.html" title="露营助手">
+        <span class="ni-icon" data-icon="tent"></span><span class="ni-label">露营</span>
+      </a>
+      <a class="nav-item" data-nav="flood" href="flood.html" title="山洪预警">
+        <span class="ni-icon" data-icon="mountain"></span><span class="ni-label">山洪</span>
+      </a>
+      <a class="nav-item" data-nav="fishing" href="fishing.html" title="钓鱼窗口">
+        <span class="ni-icon" data-icon="fish"></span><span class="ni-label">钓鱼</span>
+      </a>
+    </nav>
+    <div class="rail-foot">
+      <span class="sys"><span class="sys-dot"></span>SYS OK</span>
+      <span class="ver">DEMO v0.9</span>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <div class="tb-title">车象<span class="crumb">WEATHER OS</span></div>
+      <div class="tb-chips">
+        <span class="chip"><span class="chip-ic" data-icon="navigation"></span>G60 沪昆高速 · 嘉兴段</span>
+        <span class="chip"><span class="chip-ic" data-icon="car"></span>ACC <span class="chip-val">ON</span></span>
+        <span class="chip"><span class="chip-ic" data-icon="droplets"></span>传感器 <span class="chip-val">4/4</span></span>
+        <span class="chip"><span class="chip-ic" data-icon="thermometer"></span>车内 <span class="chip-val">22.5°</span></span>
+        <span class="chip"><span class="chip-ic" data-icon="wifi"></span>5G</span>
+      </div>
+      <div class="tb-clock"><span id="tbClock" class="mono">14:32:08</span><span id="tbDate" class="tb-date">10月26日 · 周日</span></div>
+    </header>
+
+    <main class="content">
+      <section class="page-head stagger">
+        <div class="ph-main">
+          <span class="eyebrow">05 / 休闲垂钓</span>
+          <h1 class="page-title">钓鱼窗口</h1>
+          <p class="page-sub">依据气压变化与风速评估出钓时机 · 车载气压计 + 湖面风况</p>
+        </div>
+        <div class="head-actions">
+          <span class="status-pill is-ok" id="fishPill"><span class="live-dot"></span><span id="fishPillText">适宜出钓</span></span>
+          <span class="status-pill" id="fishWindowPill"><span data-icon="clock"></span>最佳窗口 <b class="mono" id="fishWindowVal">17:00</b></span>
+        </div>
+      </section>
+
+      <div class="grid g-4-4-4 fish-grid stagger">
+        <article class="card score-card">
+          <div class="card-head">
+            <span class="ch-ic" data-icon="target"></span>
+            <h3>综合评分</h3>
+            <span class="ch-tag tag tag-ok" id="scoreTag">适宜</span>
+          </div>
+          <div class="score-wrap">
+            <svg class="score-ring" viewBox="0 0 120 120" aria-label="垂钓综合评分">
+              <circle class="sr-track" cx="60" cy="60" r="50" pathLength="100"></circle>
+              <circle class="sr-fill" id="scoreArc" cx="60" cy="60" r="50" pathLength="100" stroke-dasharray="82 100"></circle>
+            </svg>
+            <div class="score-center"><b id="scoreVal">82</b><span>FISHING SCORE</span></div>
+          </div>
+          <div class="score-rating" id="scoreRating">适宜垂钓</div>
+          <div class="best-window"><span data-icon="clock"></span>最佳时段 <b id="bestWindow">17:00 – 19:00</b></div>
+          <div class="spot-chips" id="spotChips"></div>
+        </article>
+
+        <article class="card pressure-card">
+          <div class="card-head">
+            <span class="ch-ic" data-icon="gauge"></span>
+            <h3>气压与风况</h3>
+            <span class="ch-tag tag tag-ok" id="pStateTag">持续回升</span>
+          </div>
+          <div class="p-big">
+            <span class="num-xl" id="pVal">1012</span>
+            <span>hPa</span>
+            <span class="tag tag-info" id="pDelta">+3.2 / 24h</span>
+          </div>
+          <div class="p-trend" id="pTrend">气压持续回升 · 鱼口趋活跃</div>
+          <svg class="p-chart" id="pChart" viewBox="0 0 280 66" preserveAspectRatio="none" aria-label="24 小时气压趋势">
+            <defs>
+              <linearGradient id="pcGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(47,217,192,.35)"></stop>
+                <stop offset="100%" stop-color="rgba(47,217,192,0)"></stop>
+              </linearGradient>
+            </defs>
+            <path class="pc-area" id="pArea" style="fill:url(#pcGrad)" d=""></path>
+            <path class="pc-line" id="pLine" d=""></path>
+            <circle class="pc-dot" id="pDot" cx="0" cy="0" r="3"></circle>
+          </svg>
+          <div class="p-scale"><span>24 小时前</span><span>12 小时前</span><span>现在</span></div>
+          <div class="wind-row">
+            <span class="wr-ic" data-icon="wind"></span>
+            <div><span>风速</span><b id="windSpeed">3.2 m/s</b></div>
+            <div><span>风向 / 风力</span><b id="windDir">东南风 · 3 级</b></div>
+            <em id="windGust">阵风 5.4 m/s</em>
+          </div>
+          <div class="dest-meta fish-meta">
+            <div><span>气温</span><b id="fishTemp">22 °C</b></div>
+            <div><span>水温</span><b id="waterTemp">19 °C</b></div>
+            <div><span>天况</span><b id="fishCloud">多云</b></div>
+            <div><span>评分依据</span><b>气压 60% · 风速 40%</b></div>
+          </div>
+        </article>
+
+        <article class="card window-card">
+          <div class="card-head">
+            <span class="ch-ic" data-icon="clock"></span>
+            <h3>时段窗口</h3>
+            <span class="ch-tag tag tag-dim">今日 05:00 – 21:00</span>
+          </div>
+          <ul class="win-list" id="winList"></ul>
+          <p class="logic-note">评分综合气压趋势、风速与光照；绿色时段为当日推荐出钓窗口。</p>
+        </article>
+      </div>
+
+      <article class="card advice-card">
+        <div class="card-head">
+          <span class="ch-ic" data-icon="fish"></span>
+          <h3>垂钓建议</h3>
+          <span class="ch-tag tag tag-info">气压 + 风速驱动</span>
+        </div>
+        <div class="advice-grid" id="adviceGrid"></div>
+      </article>
+    </main>
+  </div>
+
+  <script src="icons.js"></script>
+  <script src="mock.js"></script>
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+  <script src="pages/fishing.js"></script>
+</body>
+</html>

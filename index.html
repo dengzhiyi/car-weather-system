@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>气象看板 · 车象 WeatherOS</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="pages.css">
+</head>
+<body data-page="home">
+  <aside class="rail">
+    <a class="brand" href="index.html" aria-label="车象 WeatherOS 首页">
+      <span class="logo-glyph" data-icon="cloud-lightning"></span><sup>°</sup>
+    </a>
+    <nav class="rail-nav" aria-label="主导航">
+      <a class="nav-item" data-nav="home" href="index.html" title="气象看板">
+        <span class="ni-icon" data-icon="layout-dashboard"></span><span class="ni-label">气象</span>
+      </a>
+      <a class="nav-item" data-nav="rainstorm" href="rainstorm.html" title="高速暴雨辅助">
+        <span class="ni-icon" data-icon="cloud-rain"></span><span class="ni-label">暴雨</span>
+      </a>
+      <a class="nav-item" data-nav="camping" href="camping.html" title="露营助手">
+        <span class="ni-icon" data-icon="tent"></span><span class="ni-label">露营</span>
+      </a>
+      <a class="nav-item" data-nav="flood" href="flood.html" title="山洪预警">
+        <span class="ni-icon" data-icon="mountain"></span><span class="ni-label">山洪</span>
+      </a>
+      <a class="nav-item" data-nav="fishing" href="fishing.html" title="钓鱼窗口">
+        <span class="ni-icon" data-icon="fish"></span><span class="ni-label">钓鱼</span>
+      </a>
+    </nav>
+    <div class="rail-foot">
+      <span class="sys"><span class="sys-dot"></span>SYS OK</span>
+      <span class="ver">DEMO v0.9</span>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <div class="tb-title">车象<span class="crumb">WEATHER OS</span></div>
+      <div class="tb-chips">
+        <span class="chip"><span class="chip-ic" data-icon="navigation"></span>G60 沪昆高速 · 嘉兴段</span>
+        <span class="chip"><span class="chip-ic" data-icon="car"></span>ACC <span class="chip-val">ON</span></span>
+        <span class="chip"><span class="chip-ic" data-icon="droplets"></span>传感器 <span class="chip-val">4/4</span></span>
+        <span class="chip"><span class="chip-ic" data-icon="thermometer"></span>车内 <span class="chip-val">22.5°</span></span>
+        <span class="chip"><span class="chip-ic" data-icon="wifi"></span>5G</span>
+      </div>
+      <div class="tb-clock"><span id="tbClock" class="mono">14:32:08</span><span id="tbDate" class="tb-date">10月26日 · 周日</span></div>
+    </header>
+
+    <main class="content">
+      <section class="page-head stagger">
+        <div class="ph-main">
+          <span class="eyebrow">01 / 实时监测</span>
+          <h1 class="page-title">气象看板</h1>
+          <p class="page-sub">G60 沪昆高速 嘉兴段 · 多传感器融合 · 更新于 <span class="mono" id="updatedAt">14:32:08</span></p>
+        </div>
+        <div class="head-meta">
+          <div class="head-stat">
+            <span class="hs-label">数据链路</span>
+            <span class="hs-val is-ok"><span class="live-dot"></span>稳定 · 0.8 s</span>
+          </div>
+          <div class="head-stat">
+            <span class="hs-label">雨量传感器</span>
+            <span class="hs-val">RS-04 · 在线</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid g-5-3-4 home-top stagger">
+        <article class="card hero-card">
+          <div class="hero-glow" aria-hidden="true"></div>
+          <div class="hero-rings" aria-hidden="true"></div>
+          <div class="hero-top">
+            <span class="tag tag-info"><span data-icon="map-pin"></span><span id="heroLocation">嘉兴 · 南湖区</span></span>
+            <span class="hero-update">实况 · <span class="mono" id="heroUpdated">14:32</span></span>
+          </div>
+          <div class="hero-main">
+            <div class="hero-temp"><span class="num-xl" id="heroTemp">24</span><span class="hero-deg">°C</span></div>
+            <div class="hero-desc">
+              <div class="hero-cond" id="heroCondition">多云转雷阵雨</div>
+              <div class="hero-sub">体感 <span class="mono" id="heroFeels">26°</span> · 降水概率 <span class="hl mono" id="heroRainChance">78%</span></div>
+              <div class="hero-range">
+                <span data-icon="sunrise"></span><span class="mono">06:12</span>
+                <span data-icon="sunset"></span><span class="mono">17:24</span>
+              </div>
+            </div>
+            <div class="hero-weather-ic" id="heroIcon" data-icon="cloud-lightning"></div>
+          </div>
+          <div class="hero-mini">
+            <div class="mini-head">
+              <span class="mini-title">未来 2 小时</span>
+              <span class="tag tag-warn"><span data-icon="zap"></span>15:40 雷雨临近</span>
+            </div>
+            <div class="mini-list" id="miniForecast"></div>
+          </div>
+        </article>
+
+        <article class="card rain-card">
+          <div class="card-head">
+            <span class="ch-ic" data-icon="droplets"></span>
+            <h3>雨量传感器</h3>
+            <span class="ch-tag tag tag-ok"><span class="live-dot"></span>在线</span>
+          </div>
+          <div class="rain-main">
+            <div class="rain-num"><span class="num-xl" id="rainRate">12.6</span><span class="rain-unit">mm/h</span></div>
+            <span class="level-pill lv-heavy" id="rainLevel">大雨</span>
+          </div>
+          <div class="rain-scale" id="rainScale" aria-label="雨量等级刻度"></div>
+          <div class="rain-readouts">
+            <div><span>近 10 分钟</span><b class="mono" id="rainDelta">+3.2 mm</b></div>
+            <div><span>累计雨量</span><b class="mono" id="rainTotal">18.4 mm</b></div>
+          </div>
+          <div class="bars" id="rainBars" aria-hidden="true"></div>
+          <div class="bars-axis"><span>60 min</span><span>30 min</span><span>现在</span></div>
+        </article>
+
+        <article class="card env-card">
+          <div class="card-head">
+            <span class="ch-ic" data-icon="compass"></span>
+            <h3>行车环境</h3>
+            <span class="ch-tag tag tag-dim">实时</span>
+          </div>
+          <div class="env-grid">
+            <div class="env-tile">
+              <div class="et-head"><span class="et-ic" data-icon="wind"></span><span>风速</span></div>
+              <div class="et-val"><b class="mono" id="envWind">12</b><span>km/h</span></div>
+              <div class="et-meter"><i style="width:38%"></i></div>
+              <div class="et-hint" id="envWindHint">东南风 · 3 级</div>
+            </div>
+            <div class="env-tile">
+              <div class="et-head"><span class="et-ic" data-icon="gauge"></span><span>气压</span></div>
+              <div class="et-val"><b class="mono" id="envPressure">1008</b><span>hPa</span></div>
+              <div class="et-meter"><i style="width:62%" class="is-amber"></i></div>
+              <div class="et-hint">24h <span class="down" id="envPressureTrend">-1.8</span> hPa</div>
+            </div>
+            <div class="env-tile">
+              <div class="et-head"><span class="et-ic" data-icon="eye"></span><span>能见度</span></div>
+              <div class="et-val"><b class="mono" id="envVisibility">6.2</b><span>km</span></div>
+              <div class="et-meter"><i style="width:52%"></i></div>
+              <div class="et-hint">一般 · 注意车距</div>
+            </div>
+            <div class="env-tile">
+              <div class="et-head"><span class="et-ic" data-icon="droplets"></span><span>湿度</span></div>
+              <div class="et-val"><b class="mono" id="envHumidity">78</b><span>%</span></div>
+              <div class="et-meter"><i style="width:78%" class="is-aqua"></i></div>
+              <div class="et-hint">偏高 · 车窗易起雾</div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <section class="feature-strip stagger">
+        <div class="strip-head">
+          <h2 class="strip-title">功能入口 <span>/ QUICK ACCESS</span></h2>
+          <span class="strip-hint"><span data-icon="refresh-cw"></span>传感器数据已同步至各模块</span>
+        </div>
+        <div class="feature-grid" id="featureGrid"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="icons.js"></script>
+  <script src="mock.js"></script>
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+  <script src="pages/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>山洪预警 · 车象 WeatherOS</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="pages.css">
+</head>
+<body data-page="flood">
+  <aside class="rail">
+    <a class="brand" href="index.html" aria-label="车象 WeatherOS 首页">
+      <span class="logo-glyph" data-icon="cloud-lightning"></span><sup>°</sup>
+    </a>
+    <nav class="rail-nav" aria-label="主导航">
+      <a class="nav-item" data-nav="home" href="index.html" title="气象看板">
+        <span class="ni-icon" data-icon="layout-dashboard"></span><span class="ni-label">气象</span>
+      </a>
+      <a class="nav-item" data-nav="rainstorm" href="rainstorm.html" title="高速暴雨辅助">
+        <span class="ni-icon" data-icon="cloud-rain"></span><span class="ni-label">暴雨</span>
+      </a>
+      <a class="nav-item" data-nav="camping" href="camping.html" title="露营助手">
+        <span class="ni-icon" data-icon="tent"></span><span class="ni-label">露营</span>
+      </a>
+      <a class="nav-item" data-nav="flood" href="flood.html" title="山洪预警">
+        <span class="ni-icon" data-icon="mountain"></span><span class="ni-label">山洪</span>
+      </a>
+      <a class="nav-item" data-nav="fishing" href="fishing.html" title="钓鱼窗口">
+        <span class="ni-icon" data-icon="fish"></span><span class="ni-label">钓鱼</span>
+      </a>
+    </nav>
+    <div class="rail-foot">
+      <span class="sys"><span class="sys-dot"></span>SYS OK</span>
+      <span class="ver">DEMO v0.9</span>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <div class="tb-title">车象<span class="crumb">WEATHER OS</span></div>
+      <div class="tb-chips">
+        <span class="chip"><span class="chip-ic" data-icon="navigation"></span>G60 沪昆高速 · 嘉兴段</span>
+        <span class="chip"><span class="chip-ic" data-icon="car"></span>ACC <span class="chip-val">ON</span></span>
+        <span class="chip"><span class="chip-ic" data-icon="droplets"></span>传感器 <span class="chip-val">4/4</span></span>
+        <span class="chip"><span class="chip-ic" data-icon="thermometer"></span>车内 <span class="chip-val">22.5°</span></span>
+        <span class="chip"><span class="chip-ic" data-icon="wifi"></span>5G</span>
+      </div>
+      <div class="tb-clock"><span id="tbClock" class="mono">14:32:08</span><span id="tbDate" class="tb-date">10月26日 · 周日</span></div>
+    </header>
+
+    <main class="content">
+      <section class="page-head stagger">
+        <div class="ph-main">
+          <span class="eyebrow">04 / 流域安全</span>
+          <h1 class="page-title">山洪预警</h1>
+          <p class="page-sub">目的地实时雨量 + 未来 2 小时短临预报 · 双规则联动判定</p>
+        </div>
+        <div class="head-actions">
+          <span class="status-pill is-ok" id="floodPill"><span class="live-dot"></span><span id="floodPillText">低风险</span></span>
+          <div class="seg" role="group" aria-label="预警状态演示">
+            <span class="seg-label">演示</span>
+            <button class="is-active" data-mode="normal" type="button">常态</button>
+            <button data-mode="alert" type="button">暴雨预警</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="alert-banner" id="alertBanner" hidden>
+        <span class="ab-ic" data-icon="siren"></span>
+        <div class="ab-copy">
+          <b>山洪橙色预警 · 莫干山后坞溪谷</b>
+          <p>雨量传感器 52.4 mm/h 已超暴雨阈值，未来 2 小时流域累计降水 68 mm，建议立即驶离沟谷。</p>
+        </div>
+        <div class="ab-actions">
+          <button class="btn btn-danger" id="evacBtn" type="button"><span data-icon="navigation"></span>导航至避险点</button>
+          <button class="btn btn-ghost" id="muteBtn" type="button">静音</button>
+        </div>
+      </div>
+
+      <div class="grid g-7-5 flood-grid stagger">
+        <div class="flood-main">
+          <article class="card risk-card" id="riskCard">
+            <div class="card-head">
+              <span class="ch-ic" data-icon="shield-alert"></span>
+              <h3>风险研判</h3>
+              <span class="ch-tag tag tag-ok" id="riskTag">双规则未触发</span>
+            </div>
+            <div class="risk-body">
+              <div class="risk-ring-wrap">
+                <svg class="risk-ring" viewBox="0 0 120 120" aria-label="风险评分">
+                  <circle class="rr-track" cx="60" cy="60" r="50" pathLength="100"></circle>
+                  <circle class="rr-fill" id="riskArc" cx="60" cy="60" r="50" pathLength="100" stroke-dasharray="34 100"></circle>
+                </svg>
+                <div class="risk-center"><b id="riskScore">34</b><span>RISK / 100</span></div>
+              </div>
+              <div class="risk-meta">
+                <div class="risk-level" id="riskLevel">低风险</div>
+                <div class="risk-en" id="riskEn">LOW RISK</div>
+                <p class="risk-summary" id="riskSummary">当前流域降水平稳，传感器与预报均未达到预警阈值。</p>
+                <div class="risk-update">最近研判 <span id="riskUpdate">14:32:08</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card monitor-card">
+            <div class="card-head">
+              <span class="ch-ic" data-icon="waves"></span>
+              <h3>目的地降水监测</h3>
+              <span class="ch-tag tag tag-info">实时 + 短临</span>
+            </div>
+            <div class="monitor-grid">
+              <div class="mon-left">
+                <span class="mon-label">雨量传感器 · RS-04</span>
+                <div class="mon-big">
+                  <span class="num-xl" id="monRate">12.6</span>
+                  <span class="unit">mm/h</span>
+                  <span class="level-pill lv-heavy" id="monLevel">大雨</span>
+                </div>
+                <span class="mon-hint">采样 1 Hz · 设备在线</span>
+                <span class="threshold-line">暴雨阈值 50 mm/h</span>
+              </div>
+              <div>
+                <div class="mon-bars">
+                  <div class="mon-bars-head"><span>未来 2 小时累计降水</span><span class="mono" id="forecastPeak">9 mm</span></div>
+                  <div class="fc-bars" id="forecastBars"></div>
+                  <div class="fc-bars-axis"><span>+30m</span><span>+60m</span><span>+90m</span><span>+120m</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="mon-foot">
+              <span>数据源：车载雨量计 / 气象短临预报</span>
+              <span id="monFootTime">更新 14:32:08</span>
+            </div>
+          </article>
+
+          <article class="card rule-card">
+            <div class="card-head">
+              <span class="ch-ic" data-icon="sliders-horizontal"></span>
+              <h3>预警规则</h3>
+              <span class="ch-tag tag tag-dim">双规则</span>
+            </div>
+            <div class="rule-list" id="ruleList"></div>
+            <p class="logic-note">任一规则命中即触发预警；两条规则同时命中时升级为橙色预警并语音播报。</p>
+          </article>
+        </div>
+
+        <div class="flood-dest-stack">
+          <article class="card dest-card">
+            <div class="card-head">
+              <span class="ch-ic" data-icon="map-pin"></span>
+              <h3>目的地 · 山洪影响区</h3>
+              <span class="ch-tag tag tag-ok" id="destStatus">安全</span>
+            </div>
+            <div class="dest-title">
+              <div>
+                <h3 id="destName">莫干山 · 后坞溪谷</h3>
+                <span class="dim mono" id="destCoord">30.6338° N, 119.8682° E</span>
+              </div>
+            </div>
+            <div class="dest-terrain">
+              <svg viewBox="0 0 300 96" preserveAspectRatio="none" aria-label="沟谷地形示意">
+                <rect width="300" height="96" fill="#08160F"></rect>
+                <path d="M-10 20 C60 4 110 30 170 14 C230 -2 280 18 310 8" fill="none" stroke="#19402F" stroke-width="1.2"></path>
+                <path d="M-10 34 C60 18 112 44 172 28 C232 12 282 32 310 22" fill="none" stroke="#19402F" stroke-width="1.2"></path>
+                <path d="M-10 48 C60 32 112 58 172 42 C232 26 282 46 310 36" fill="none" stroke="#1E4A37" stroke-width="1.2"></path>
+                <path d="M-10 62 C60 46 112 72 172 56 C232 40 282 60 310 50" fill="none" stroke="#1E4A37" stroke-width="1.2"></path>
+                <path d="M-10 76 C60 60 112 86 172 70 C232 54 282 74 310 64" fill="none" stroke="#19402F" stroke-width="1.2"></path>
+                <path d="M-10 90 C60 74 112 100 172 84 C232 68 282 88 310 78" fill="none" stroke="#19402F" stroke-width="1.2"></path>
+                <path d="M96 96 C120 74 128 62 160 50 C188 40 200 26 214 4" fill="none" stroke="#2E7C91" stroke-width="2" stroke-dasharray="4 4"></path>
+                <circle cx="160" cy="50" r="4" fill="#FFB35C"></circle>
+                <circle cx="160" cy="50" r="9" fill="none" stroke="rgba(255,179,92,.5)" stroke-width="1"></circle>
+                <text x="172" y="46" fill="#C7A176" font-size="9">后坞溪谷</text>
+                <text x="16" y="18" fill="#3F6B57" font-size="8" letter-spacing="1">上游集水区</text>
+              </svg>
+            </div>
+            <div class="dest-meta">
+              <div><span>距离</span><b id="destDistance">68 km</b></div>
+              <div><span>地形</span><b id="destTerrain">沟谷汇水区</b></div>
+              <div><span>海拔</span><b id="destElevation">420 m</b></div>
+              <div><span>响应时间</span><b id="destResponse">18 min</b></div>
+            </div>
+          </article>
+
+          <article class="card notify-card">
+            <div class="card-head">
+              <span class="ch-ic" data-icon="bell"></span>
+              <h3>预警通知</h3>
+              <span class="ch-tag tag tag-ok">2 项已开启</span>
+            </div>
+            <div class="notify-row">
+              <span class="rule-ic" data-icon="volume-2"></span>
+              <div class="notify-body"><b>车机语音播报</b><p>预警触发时车内语音提示</p></div>
+              <div class="switch js-switch" role="switch" aria-checked="true" tabindex="0" data-toast="车机语音播报"><span class="knob"></span></div>
+            </div>
+            <div class="notify-row">
+              <span class="rule-ic" data-icon="smartphone"></span>
+              <div class="notify-body"><b>手机推送</b><p>同步至车主手机端</p></div>
+              <div class="switch js-switch" role="switch" aria-checked="true" tabindex="0" data-toast="手机推送"><span class="knob"></span></div>
+            </div>
+            <div class="notify-row">
+              <span class="rule-ic" data-icon="siren"></span>
+              <div class="notify-body"><b>鸣笛警示</b><p>紧急预警时短鸣一声</p></div>
+              <div class="switch js-switch" role="switch" aria-checked="false" tabindex="0" data-toast="鸣笛警示"><span class="knob"></span></div>
+            </div>
+          </article>
+
+          <article class="card history-card">
+            <div class="card-head">
+              <span class="ch-ic" data-icon="history"></span>
+              <h3>历史预警</h3>
+              <span class="ch-tag tag tag-dim">近 30 天</span>
+            </div>
+            <ul class="history-list" id="historyList"></ul>
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="icons.js"></script>
+  <script src="mock.js"></script>
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+  <script src="pages/flood.js"></script>
+</body>
+</html>
