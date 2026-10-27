@@ -63,19 +63,27 @@ body[data-page="fishing"] .nav-item[data-nav="fishing"]:before { opacity: 1; }
 }
 .tb-title { font-family: var(--display); font-size: var(--fs-lg); font-weight: 700; letter-spacing: .6px; display: flex; align-items: center; gap: 10px; }
 .tb-chips { display: flex; align-items: center; gap: 10px; margin-left: auto; overflow: hidden; }
+/* 页面级信息/状态控件统一规格：高 44px（触控下限）、字号 --fs-sm、圆角胶囊 */
 .chip {
-  display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 15px;
+  display: inline-flex; align-items: center; gap: 10px; height: var(--tap-min); padding: 0 16px;
   border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border);
-  color: var(--text-sub); font-size: var(--fs-2xs); white-space: nowrap;
+  color: var(--text-sub); font-size: var(--fs-sm); font-family: var(--display); white-space: nowrap;
 }
 .chip .chip-ic { width: 16px; height: 16px; }
 .chip .chip-ic svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .chip .chip-val { color: var(--text); font-family: var(--mono); }
 .chip.warn { border-color: rgba(255,179,92,.4); color: var(--amber); }
 .chip .chip-val.hot { color: var(--danger); }
-.tb-clock { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.25; white-space: nowrap; }
-.tb-clock #tbClock { font-family: var(--mono); font-size: var(--fs-md); color: var(--text); letter-spacing: 1px; }
-.tb-date { font-size: var(--fs-3xs); color: var(--text-dim); letter-spacing: .5px; }
+/* 时钟与日期同字族同字号，仅靠颜色区分层级 */
+.tb-clock {
+  display: flex; align-items: baseline; gap: 10px; white-space: nowrap;
+  font-family: var(--display); font-size: var(--fs-md);
+}
+.tb-clock #tbClock {
+  font-family: inherit; font-size: inherit; font-weight: 700; color: var(--text);
+  letter-spacing: 1px; font-variant-numeric: tabular-nums;
+}
+.tb-date { font-family: inherit; font-size: inherit; font-weight: 500; color: var(--text-sub); letter-spacing: .5px; }
 
 /* ---------- Content + grids ---------- */
 .content { padding: 24px 28px 44px; position: relative; z-index: 1; }

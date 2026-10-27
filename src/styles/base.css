@@ -36,6 +36,13 @@ body::after {
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
 input, select { font-family: inherit; }
+/* 内联图标默认按 1em 渲染（跟随所在容器字号），组件可按需显式覆盖宽高 */
+[data-icon] svg {
+  width: 1em; height: 1em; flex: none;
+  fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+[data-icon] svg * { stroke-linecap: round; stroke-linejoin: round; }
 ::-webkit-scrollbar { width: 9px; height: 9px; }
 ::-webkit-scrollbar-thumb { background: #1f3346; border-radius: 9px; }
 ::-webkit-scrollbar-track { background: transparent; }

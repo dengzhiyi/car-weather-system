@@ -3,26 +3,24 @@ import { Weather } from '../src/adapters/weather.js';
 import { Api } from '../src/api/api.js';
 import { SITE } from '../src/config/site.js';
 
-/* 真实接口返回的 15 分钟序列（取 8 个点，字段与单位同线上一致：psz 为 Pa、ws10m 为 m/s） */
+/* 真实接口返回的 15 分钟序列（取 17 个点覆盖 4 小时，字段与单位同线上一致：psz 为 Pa、ws10m 为 m/s） */
 function fixture() {
-  const rates = [0.00008, 0.00006, 0.00004, 0.00002, 0.00001, 0.00001, 0.00001, 0.00001];
-  const temps = [24.53, 24.45, 24.36, 24.28, 24.2, 24.17, 24.14, 24.11];
-  const winds = [1.91, 1.84, 1.76, 1.69, 1.62, 1.56, 1.51, 1.45];
-  const begins = [101118.06, 101124.5, 101130.94, 101137.38, 101143.82, 101148.81, 101153.81, 101158.81];
-  const data = rates.map(function (_, i) {
-    const minute = 15 * i;
-    const mm = String(minute % 60).padStart(2, '0');
-    const hh = String(21 + Math.floor(minute / 60)).padStart(2, '0');
-    return {
-      time: '2026-10-26T' + hh + ':' + mm + '+08:00',
+  const base = Date.parse('2026-10-26T21:00+08:00');
+  const data = [];
+  for (let i = 0; i < 17; i += 1) {
+    const at = base + i * 15 * 60 * 1000;
+    /* 本地 +08:00 墙钟时间，保持与线上返回字段一致 */
+    const local = new Date(at + 8 * 60 * 60 * 1000).toISOString().slice(0, 16) + '+08:00';
+    data.push({
+      time: local,
       wd10m: 155.31 + i,
-      ws10m: winds[i],
-      t2m: temps[i],
+      ws10m: 1.91 - 0.005 * i,
+      t2m: 24.53 - 0.02 * i,
       rh2m: 87.31,
-      psz: begins[i],
-      tp: rates[i]
-    };
-  });
+      psz: 101118.06 + 6.44 * i,
+      tp: 0.00008
+    });
+  }
   return { code: 200, message: '成功', data: { data: data } };
 }
 
@@ -40,7 +38,7 @@ describe('Weather.readSeries', () => {
       return { ok: true, json: async function () { return fixture(); } };
     });
     const series = await Weather.readSeries(SITE);
-    expect(series).toHaveLength(8);
+    expect(series).toHaveLength(17);
     const first = series[0];
     expect(first.at).toBe(Date.parse('2026-10-26T21:00+08:00'));
     expect(first.temp).toBeCloseTo(24.53, 2);
@@ -86,15 +84,15 @@ describe('Api.getDashboard 天气映射', () => {
     expect(w.visibility).toBe(18.5);
     expect(w.updatedAt).toBe('21:00');
 
-    const hourly = res.data.forecast2h;
-    expect(hourly).toHaveLength(4);
+    const hourly = res.data.forecast4h;
+    expect(hourly).toHaveLength(5);
     expect(hourly[0].time).toBe('21:00');
-    expect(hourly[1].time).toBe('21:30');
-    expect(hourly[3].time).toBe('22:30');
+    expect(hourly[1].time).toBe('22:00');
+    expect(hourly[4].time).toBe('01:00');
     expect(hourly[0].label).toBe('现在');
-    expect(hourly[1].label).toBe('30 分钟后');
+    expect(hourly[1].label).toBe('1 小时后');
     expect(hourly[0].temp).toBe(25);
-    expect(hourly[3].temp).toBe(24);
+    expect(hourly[4].temp).toBe(24);
   });
 
   it('接口不可用时退回本地 mock，看板结构不变', async () => {
@@ -108,7 +106,7 @@ describe('Api.getDashboard 天气映射', () => {
     const w = res.data.weather;
     expect(w.location).toBe('深圳 · 坪山');
     expect(typeof w.temp).toBe('number');
-    expect(res.data.forecast2h).toHaveLength(4);
+    expect(res.data.forecast4h).toHaveLength(5);
     expect(res.data.features).toHaveLength(4);
   });
 });

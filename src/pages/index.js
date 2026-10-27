@@ -19,18 +19,17 @@ async function renderDashboard() {
   $('#heroFeels').textContent = d.weather.feels + '°';
   $('#heroRainChance').textContent = d.weather.rainChance + '%';
   $('#updatedAt').textContent = d.weather.updatedAt || '14:32:08';
-  $('#heroUpdated').textContent = (d.weather.updatedAt || '14:32:08').slice(0, 5);
   const heroIcon = $('#heroIcon');
   heroIcon.setAttribute('data-icon', d.weather.icon);
   heroIcon.removeAttribute('data-icon-ready');
   icons(heroIcon.parentNode);
 
-  /* 未来 2 小时 */
-  const hint = rainHintOf(d.forecast2h);
+  /* 未来 4 小时 */
+  const hint = rainHintOf(d.forecast4h);
   $('#miniHint').className = 'tag tag-' + hint.tone;
   $('#miniHintText').textContent = hint.text;
   const mini = $('#miniForecast');
-  mini.innerHTML = d.forecast2h.map(function (f, i) {
+  mini.innerHTML = d.forecast4h.map(function (f, i) {
     return (
       '<div class="mini-item' + (i === 0 ? ' is-now' : '') + '">' +
         '<span class="mi-time">' + f.time + '</span>' +

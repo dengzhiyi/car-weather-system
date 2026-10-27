@@ -4,7 +4,9 @@
    ============================================================ */
 
 /* ---------- Page head ---------- */
+/* 抬高层级：说明浮层需盖住下方卡片（卡片自身 z-index:1） */
 .page-head {
+  position: relative; z-index: 5;
   display: flex; align-items: flex-end; justify-content: space-between;
   gap: 24px; margin-bottom: 20px; flex-wrap: wrap;
 }
@@ -14,9 +16,9 @@
   font-family: var(--display); font-size: var(--fs-3xl); font-weight: 800;
   letter-spacing: 1px; line-height: 1.15;
 }
-/* 标题旁「?」：默认隐藏说明，点击弹出 */
+/* 标题旁「?」：默认隐藏说明，点击弹出。纯图标按钮统一 40px */
 .help-btn {
-  width: 36px; height: 36px; border-radius: 50%; flex: none;
+  width: 40px; height: 40px; border-radius: 50%; flex: none;
   display: grid; place-items: center; color: var(--text-dim);
   border: 1px solid var(--border-strong); background: rgba(255,255,255,.03);
   transition: color .18s, border-color .18s, background .18s;
@@ -44,12 +46,24 @@
   background: currentColor; box-shadow: 0 0 8px 1px currentColor; animation: pulseDot 2.4s infinite;
 }
 .head-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+/* 「数据更新于」等页面级状态胶囊：与顶栏 chip、分段控件统一为 44px / --fs-sm */
 .status-pill {
-  display: inline-flex; align-items: center; gap: 9px; height: 40px; padding: 0 16px;
-  border-radius: 999px; border: 1px solid var(--border-strong); font-size: var(--fs-2xs);
+  display: inline-flex; align-items: center; gap: 9px; height: var(--tap-min); padding: 0 16px;
+  border-radius: 999px; border: 1px solid var(--border-strong);
+  font-size: var(--fs-sm); font-family: var(--display); font-weight: 500;
   background: rgba(255,255,255,.025); color: var(--text-sub);
 }
-.status-pill span[data-icon] { display: inline-flex; width: 15px; height: 15px; }
+.status-pill span[data-icon] { display: inline-flex; width: 16px; height: 16px; }
+/* 胶囊内的数值与标签同字族同字号，仅加粗，避免看起来比文字更小 */
+.status-pill .mono {
+  font-family: inherit; font-size: inherit; font-weight: 700;
+  letter-spacing: .3px; font-variant-numeric: tabular-nums;
+}
+/* 状态区里的 tag 与胶囊同规格，两个控件不再一大一小 */
+.head-actions .tag {
+  height: var(--tap-min); padding: 0 16px; gap: 9px;
+  font-size: var(--fs-sm); font-family: var(--display);
+}
 .status-pill.is-warn { color: var(--amber); border-color: rgba(255,179,92,.4); background: rgba(255,179,92,.08); }
 .status-pill.is-danger { color: var(--danger); border-color: rgba(255,95,95,.45); background: rgba(255,95,95,.1); }
 .status-pill.is-off { color: var(--text-sub); }
@@ -73,7 +87,6 @@
 }
 .hero-top { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .hero-top .tag svg { width: 13px; height: 13px; }
-.hero-update { font-family: var(--mono); font-size: var(--fs-3xs); color: var(--text-dim); letter-spacing: .6px; }
 .hero-main { position: relative; z-index: 1; display: flex; align-items: center; gap: 20px; margin-top: 18px; }
 .hero-temp { display: flex; align-items: flex-start; }
 .hero-temp .num-xl {
@@ -100,7 +113,7 @@
 .mini-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .mini-head .tag svg { width: 12px; height: 12px; }
 .mini-title { font-size: var(--fs-3xs); letter-spacing: 1.2px; color: var(--text-dim); }
-.mini-list { display: grid; grid-template-columns: repeat(4, 1fr); }
+.mini-list { display: grid; grid-template-columns: repeat(5, 1fr); }
 .mini-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 2px 4px; }
 .mini-item + .mini-item { border-left: 1px solid var(--border); }
 .mi-time { font-family: var(--mono); font-size: var(--fs-3xs); color: var(--text-dim); }
@@ -117,8 +130,9 @@
 .rain-num { display: flex; align-items: flex-start; gap: 4px; }
 .rain-num .num-xl { font-size: 3.625rem; color: #e1f2ff; letter-spacing: -.5px; }
 .rain-unit { font-size: var(--fs-3xs); color: var(--text-dim); margin-top: 12px; }
+/* 雨量等级标签与卡片内 tag 同规格（26px / --fs-3xs / 胶囊） */
 .level-pill {
-  margin-left: auto; height: 28px; padding: 0 12px; border-radius: 6px; font-size: var(--fs-2xs);
+  margin-left: auto; height: 26px; padding: 0 11px; border-radius: 999px; font-size: var(--fs-3xs);
   display: inline-flex; align-items: center; gap: 5px; border: 1px solid;
 }
 .lv-light { color: #8fd0ff; border-color: rgba(89,183,255,.35); background: rgba(89,183,255,.08); }
@@ -242,7 +256,7 @@
   box-shadow: var(--shadow-card), 0 0 0 1px rgba(89,183,255,.1), 0 0 42px -18px rgba(89,183,255,.75);
 }
 .assist-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.assist-head h3 { font-family: var(--display); font-size: 1.375rem; font-weight: 800; letter-spacing: .6px; }
+.assist-head h3 { font-family: var(--display); font-size: var(--fs-base); font-weight: 700; letter-spacing: .5px; }
 .assist-desc { margin-top: 10px; font-size: var(--fs-2xs); color: var(--text-sub); line-height: 1.6; }
 .assist-state {
   display: flex; align-items: center; gap: 8px; margin-top: 14px; padding: 10px 13px;
@@ -341,7 +355,7 @@
 
 .plan-card { display: flex; flex-direction: column; }
 .search-row { display: flex; gap: 10px; align-items: stretch; }
-.search-box { flex: 1; display: flex; align-items: center; gap: 9px; height: 46px; padding: 0 14px; border-radius: 10px; background: rgba(6,12,18,.7); border: 1px solid var(--border-strong); transition: border-color .18s; min-width: 0; }
+.search-box { flex: 1; display: flex; align-items: center; gap: 9px; height: var(--tap-min); padding: 0 14px; border-radius: 10px; background: rgba(6,12,18,.7); border: 1px solid var(--border-strong); transition: border-color .18s; min-width: 0; }
 .search-box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(89,183,255,.14); }
 .search-box > span { display: inline-flex; font-size: var(--fs-md); color: var(--text-dim); flex: none; }
 .dest-input { flex: 1; min-width: 0; border: none; background: none; outline: none; color: var(--text); font-size: var(--fs-sm); }
@@ -360,7 +374,7 @@
 
 .arrival-card { display: flex; flex-direction: column; position: relative; }
 .arrival-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-.arrival-head h3 { font-family: var(--display); font-size: var(--fs-lg); font-weight: 800; letter-spacing: .6px; }
+.arrival-head h3 { font-family: var(--display); font-size: var(--fs-base); font-weight: 700; letter-spacing: .5px; }
 .arrival-main { display: flex; align-items: center; gap: 14px; margin-top: 12px; }
 .arrival-temp { display: flex; align-items: flex-start; }
 .arrival-temp .num-xl { font-size: 3.5rem; }
@@ -397,7 +411,7 @@
 .ab-main small { font-size: var(--fs-3xs); font-weight: 400; color: var(--text-dim); margin-left: 4px; }
 .ab-text { font-size: var(--fs-3xs); color: var(--text-sub); line-height: 1.7; margin-top: 5px; }
 .ab-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
-.ab-chips .tag { font-size: var(--fs-3xs); height: 24px; }
+.ab-chips .tag { font-size: var(--fs-3xs); height: 26px; }
 
 /* ---------- Flood ---------- */
 .alert-banner {
@@ -415,8 +429,9 @@
 .ab-copy p { font-size: var(--fs-2xs); color: #f3c7c7; margin-top: 3px; }
 .ab-actions { display: flex; gap: 8px; flex: none; }
 .seg { display: inline-flex; align-items: center; gap: 3px; padding: 3px; border-radius: 999px; background: rgba(255,255,255,.035); border: 1px solid var(--border); }
-.seg-label { font-size: var(--fs-3xs); color: var(--text-dim); letter-spacing: 1px; padding: 0 8px; }
-.seg button { height: 34px; padding: 0 14px; border-radius: 999px; font-size: var(--fs-2xs); color: var(--text-sub); transition: .18s; }
+.seg-label { font-size: var(--fs-sm); color: var(--text-dim); letter-spacing: 1px; padding: 0 8px; }
+/* 按钮 36 + 上下内距 3 ×2 + 边框 = 44，与 status-pill 同高；字号与页面级控件统一为 --fs-sm */
+.seg button { height: 36px; padding: 0 14px; border-radius: 999px; font-size: var(--fs-sm); color: var(--text-sub); transition: .18s; }
 .seg button:hover { color: var(--text); }
 .seg button.is-active { background: #1c2b39; color: var(--text); box-shadow: 0 1px 0 rgba(255,255,255,.05) inset; }
 
@@ -442,18 +457,19 @@
 .mon-big { display: flex; align-items: flex-end; gap: 5px; margin-top: 5px; }
 .mon-big .num-xl { font-size: 2.875rem; }
 .mon-big .unit { font-size: var(--fs-3xs); color: var(--text-dim); margin-bottom: 9px; }
-.mon-big .level-pill { margin: 0 0 6px 6px; height: 24px; font-size: var(--fs-3xs); }
+.mon-big .level-pill { margin: 0 0 6px 6px; }
 .mon-hint { font-size: var(--fs-3xs); color: var(--text-dim); margin-top: 5px; }
 .threshold-line { display: flex; align-items: center; gap: 7px; margin-top: 14px; font-family: var(--mono); font-size: var(--fs-3xs); color: var(--amber); }
 .threshold-line::before { content: ""; width: 16px; border-top: 1px dashed var(--amber); }
 .mon-bars { display: flex; flex-direction: column; gap: 6px; }
 .mon-bars-head { display: flex; justify-content: space-between; font-size: var(--fs-3xs); color: var(--text-dim); }
-.fc-bars { position: relative; flex: 1; display: flex; align-items: flex-end; gap: 8px; height: 92px; margin-top: 6px; padding-top: 8px; }
+/* flex 子项在纵向弹性容器里会被压扁，用 min-height 保住柱状图高度 */
+.fc-bars { position: relative; flex: 1 0 auto; display: flex; align-items: flex-end; gap: 8px; height: 92px; min-height: 92px; margin-top: 6px; padding-top: 8px; }
 .fc-bars .fbar { flex: 1; border-radius: 3px 3px 0 0; background: linear-gradient(180deg, rgba(89,183,255,.85), rgba(29,108,159,.35)); transition: height .6s var(--ease); }
 .fc-bars .fbar.is-over { background: linear-gradient(180deg, #ff8f8f, #8f2c2c); }
 .fc-threshold { position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(255,179,92,.5); z-index: 1; }
 .fc-threshold span { position: absolute; right: 0; top: -14px; font-family: var(--mono); font-size: var(--fs-3xs); color: var(--amber); }
-.fc-bars-axis { display: flex; justify-content: space-between; font-size: var(--fs-3xs); color: var(--text-dim); font-family: var(--mono); margin-top: 4px; }
+.fc-bars-axis { display: flex; justify-content: space-between; font-size: var(--fs-3xs); color: var(--text-dim); font-family: var(--mono); margin-top: 14px; }
 .mon-foot { display: flex; justify-content: space-between; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); font-size: var(--fs-3xs); color: var(--text-dim); }
 
 .rule-card { display: flex; flex-direction: column; }
@@ -482,15 +498,13 @@
 .notify-body { flex: 1; }
 .notify-body b { font-size: var(--fs-2xs); font-weight: 500; }
 .notify-body p { font-size: var(--fs-3xs); color: var(--text-dim); margin-top: 2px; }
-.notify-row .switch { width: 56px; height: 32px; }
-.notify-row .switch .knob { width: 24px; height: 24px; }
-.notify-row .switch[aria-checked="true"] .knob { transform: translateX(24px); }
 .history-list { list-style: none; display: flex; flex-direction: column; }
 .history-list li { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid rgba(148,180,204,.06); }
 .history-list li:last-child { border-bottom: none; }
 .history-list time { font-family: var(--mono); font-size: var(--fs-3xs); color: var(--text-dim); width: 96px; flex: none; padding-top: 2px; }
 .hl-body b { font-size: var(--fs-2xs); font-weight: 500; display: block; }
 .hl-body p { font-size: var(--fs-3xs); color: var(--text-dim); margin-top: 2px; }
+.flood-main { display: flex; flex-direction: column; gap: 18px; }
 .flood-dest-stack { display: flex; flex-direction: column; gap: 18px; }
 
 /* ---------- Fishing ---------- */

@@ -20,8 +20,8 @@ import {
   pressureTrendOf
 } from '../domain/weather.view.js';
 
-/* 逐时预报取 0 / 30 / 60 / 90 分钟四个时刻 */
-const HOURLY_OFFSETS = [0, 30, 60, 90];
+/* 逐时预报取当前 + 未来 4 小时，每小时一列 */
+const HOURLY_OFFSETS = [0, 60, 120, 180, 240];
 
 /* 首页功能卡上的评级短文案 */
 const FISHING_RATING_SHORT = {
@@ -93,7 +93,7 @@ function describeHourly(series) {
     const sky = skyOf(point.rainRate, point.humidity);
     return {
       time: String(point.time).slice(11, 16),
-      label: offset === 0 ? '现在' : offset + ' 分钟后',
+      label: offset === 0 ? '现在' : offset / 60 + ' 小时后',
       temp: Math.round(point.temp),
       icon: sky.icon,
       rain: rainChanceOf(point.rainRate),
@@ -102,21 +102,21 @@ function describeHourly(series) {
   });
 }
 
-/* GET /api/dashboard  →  { vehicle, weather, rain, forecast2h, features } */
+/* GET /api/dashboard  →  { vehicle, weather, rain, forecast4h, features } */
 async function getDashboard() {
   await delay(240);
   const rain = await Sensor.readVehicleRain();
   const level = rainLevelOf(rain.rate, rain.thresholds);
   let weather;
-  let forecast2h;
+  let forecast4h;
   try {
     const series = await Weather.readSeries(SITE);
     weather = describeWeather(series, SITE);
-    forecast2h = describeHourly(series);
+    forecast4h = describeHourly(series);
   } catch (error) {
     /* 接口不可用（断网 / 订阅异常）时退回本地 mock，保证看板可用 */
     weather = DB.weather;
-    forecast2h = DB.forecast2h;
+    forecast4h = DB.forecast4h;
   }
   return {
     code: 0,
@@ -124,7 +124,7 @@ async function getDashboard() {
       vehicle: DB.vehicle,
       weather: weather,
       rain: Object.assign({}, rain, { level: level.name, levelIndex: level.index }),
-      forecast2h: forecast2h,
+      forecast4h: forecast4h,
       features: featuresWithLiveMetric()
     }
   };

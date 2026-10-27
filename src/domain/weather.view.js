@@ -93,7 +93,7 @@ function humidityHintOf(humidity) {
   return '干燥 · 注意补水';
 }
 
-/* 未来 2 小时预报 → 降水临近提示（取降水概率最高的一档） */
+/* 未来 4 小时预报 → 降水临近提示（取降水概率最高的一档） */
 function rainHintOf(forecast) {
   const list = forecast || [];
   if (!list.length) return { text: '暂无降水预报', tone: 'ok' };
@@ -103,7 +103,7 @@ function rainHintOf(forecast) {
   }
   if (peak.rain >= 70) return { text: peak.time + ' 雷雨临近', tone: 'warn' };
   if (peak.rain >= 40) return { text: peak.time + ' 有阵雨可能', tone: 'info' };
-  return { text: '2 小时内无明显降水', tone: 'ok' };
+  return { text: '4 小时内无明显降水', tone: 'ok' };
 }
 
 /* 气压趋势（hPa）：未来值 − 当前值 */
