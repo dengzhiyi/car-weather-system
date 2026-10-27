@@ -27,6 +27,7 @@
 │  ├─ shell/   rail.html  topbar.html          # App Shell 片段（构建时注入）
 │  ├─ core/    dom.js  app.js  icons.js        # 通用工具 / 全局引导 / 内联 SVG 字典
 │  ├─ domain/  rain.js  rainstorm.rules.js  flood.rules.js  fishing.rules.js
+│  ├─ adapters/ sensor.js  weather.js  amap.js  # 外部数据源隔离层
 │  ├─ api/     api.js                          # 接口 stub（签名即未来真实接口）
 │  ├─ data/    mock.js                         # 单一 mock 数据源（只存原始读数）
 │  ├─ pages/   index.js  rainstorm.js  camping.js  flood.js  fishing.js
@@ -42,8 +43,9 @@
 
 - `core/*` 通用工具，不依赖任何业务模块
 - `domain/*` 纯业务规则（雨量→车速/跟车、山洪双规则、钓鱼评分），**只做计算，不触碰 DOM / 网络 / localStorage**，阈值由调用方传入
+- `adapters/*` 外部数据源隔离层（`Sensor` 雨量传感器 / `Weather` 天气服务 / `Amap` 高德地图），只做字段归一化，**不含业务判断**；接真实数据源时只改这一层
 - `data/*` 只存原始读数，不存"结论型"字段；页面所需结论一律由 `domain/*` 现算
-- `api/*` 组织数据并调用 `domain/*`，签名即未来真实接口
+- `api/*` 组合 adapters 取数、调用 `domain/*` 计算，签名即未来真实接口
 - `pages/*` 只做视图渲染，不写业务阈值、不直接 fetch
 
 ## 运行
@@ -73,7 +75,8 @@ npm run check:dist   # 需先 npm run build
 
 - `src/data/mock.js` → `export { DB }`：所有 mock 原始读数的唯一来源
 - `src/domain/*`：纯函数规则，`rainLevelOf` / `rainAssistPlan` / `evaluateFlood` / `fishingScore` / `pressureStateOf`
-- `src/api/api.js` → `export { Api }`：`getDashboard / setRainAssist / planDestination / getFloodStatus / getFishingWindow`，每个函数标注了预期的 HTTP method 与 path，内部调用 `domain/*` 计算，接后端时只替换函数体
+- `src/adapters/*`：`Sensor.readVehicleRain / readBasinGauge`、`Weather.readCurrent / readHourly / readBasinForecast / readArrivalBrief / readFishingSpot`、`Amap.searchDestination / planRoute`
+- `src/api/api.js` → `export { Api }`：`getDashboard / setRainAssist / planDestination / getFloodStatus / getFishingWindow`，每个函数标注了预期的 HTTP method 与 path，接后端时只替换 adapters 实现，本层返回结构不变
 - `src/core/icons.js`：`data-icon="name"` 挂载内联 SVG，无 CDN、无字体图标
 
 ## 兼容性
@@ -89,8 +92,8 @@ npm run check:dist   # 需先 npm run build
 ## 后续规划
 
 1. ~~**业务规则下沉**：抽 `domain/`（雨量→车速/跟车、山洪双规则、钓鱼评分）为纯函数并补单测~~ ✅ 已完成
-2. **外部依赖隔离**：`adapters/`（雨量传感器、天气、高德）统一接口
-3. **后端接入**：替换 `src/api/api.js` 的 stub 实现
+2. ~~**外部依赖隔离**：`adapters/`（雨量传感器、天气、高德）统一接口~~ ✅ 已完成
+3. **后端接入**：替换 `src/adapters/*` 的 mock 实现，`api/*` 返回结构不变
 4. **Android 打包**：Capacitor（`webDir: dist`），横屏 + 沉浸式 + keep-awake
 
 ## 许可

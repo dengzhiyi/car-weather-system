@@ -28,20 +28,20 @@ function markChips(id) {
 }
 
 /* ---------- 渲染到达信息 ---------- */
-function renderDestination(dest) {
+function renderDestination(dest, route) {
   current = dest;
   input.value = dest.name;
   $('#campStatusText').textContent = '目的地：' + dest.name;
   $('#mapDestChip').textContent = dest.name;
   $('#mapDestLabel').textContent = dest.name;
-  $('#mapDistance').textContent = dest.distance;
-  $('#mapDuration').textContent = dest.duration;
-  $('#routeMeta').textContent = dest.distance + ' · ' + dest.duration + ' · 预计 ' + dest.arrival + ' 到达';
+  $('#mapDistance').textContent = route.distance;
+  $('#mapDuration').textContent = route.duration;
+  $('#routeMeta').textContent = route.distance + ' · ' + route.duration + ' · 预计 ' + route.arrival + ' 到达';
   $('#adviceDest').textContent = dest.name;
 
   $('#arrTemp').textContent = dest.temp;
   $('#arrCond').textContent = dest.condition;
-  $('#arrArrival').textContent = '预计 ' + dest.arrival + ' 到达';
+  $('#arrArrival').textContent = '预计 ' + route.arrival + ' 到达';
   $('#arrRain').textContent = dest.rainChance + '%';
   $('#arrWind').textContent = dest.wind;
   $('#arrPressure').textContent = dest.pressure + ' hPa';
@@ -107,7 +107,7 @@ async function plan(query) {
     toast(res.message || '路线规划失败，请重试', 'danger');
     return;
   }
-  renderDestination(res.data.destination);
+  renderDestination(res.data.destination, res.data.route);
   toast('目的地已设定 · 高德路线与天气已同步', 'ok');
 }
 
@@ -141,5 +141,9 @@ $('#zoomIn').addEventListener('click', function () { zoom(0.15); });
 $('#zoomOut').addEventListener('click', function () { zoom(-0.15); });
 
 /* ---------- 初始状态 ---------- */
-renderDestination(current);
+renderDestination(current, {
+  distance: current.distance,
+  duration: current.duration,
+  arrival: current.arrival
+});
 
