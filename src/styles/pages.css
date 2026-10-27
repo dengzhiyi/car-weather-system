@@ -31,7 +31,7 @@
   border-radius: 999px; border: 1px solid var(--border-strong); font-size: 12px;
   background: rgba(255,255,255,.025); color: var(--text-sub);
 }
-.status-pill.is-ok { color: var(--ok); border-color: rgba(69,214,138,.35); background: rgba(69,214,138,.08); }
+.status-pill span[data-icon] { display: inline-flex; width: 13px; height: 13px; }
 .status-pill.is-warn { color: var(--amber); border-color: rgba(255,179,92,.4); background: rgba(255,179,92,.08); }
 .status-pill.is-danger { color: var(--danger); border-color: rgba(255,95,95,.45); background: rgba(255,95,95,.1); }
 .status-pill.is-off { color: var(--text-sub); }
@@ -380,7 +380,7 @@
 .advice-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; position: relative; z-index: 1; }
 .advice-block { padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,.026); border: 1px solid var(--border); }
 .ab-head { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--text-sub); margin-bottom: 6px; }
-.ab-head span { display: inline-flex; font-size: 14px; color: var(--primary); }
+.ab-head span { display: inline-flex; width: 14px; height: 14px; font-size: 14px; color: var(--primary); }
 .ab-main { font-family: var(--display); font-size: 24px; font-weight: 700; line-height: 1.1; }
 .ab-main small { font-size: 10px; font-weight: 400; color: var(--text-dim); margin-left: 4px; }
 .ab-text { font-size: 10.5px; color: var(--text-sub); line-height: 1.65; margin-top: 4px; }
@@ -467,6 +467,7 @@
 .dest-meta b { font-size: 11.5px; font-weight: 500; }
 .notify-card { display: flex; flex-direction: column; }
 .notify-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid rgba(148,180,204,.06); }
+.notify-row .rule-ic { display: inline-flex; width: 17px; height: 17px; color: var(--primary); flex: none; }
 .notify-row:last-child { border-bottom: none; }
 .notify-body { flex: 1; }
 .notify-body b { font-size: 11.5px; font-weight: 500; }

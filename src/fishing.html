@@ -5,55 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>钓鱼窗口 · 车象 WeatherOS</title>
   <meta name="theme-color" content="#060B10">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'">
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/css/tokens.css">
-  <link rel="stylesheet" href="assets/css/base.css">
-  <link rel="stylesheet" href="assets/css/components.css">
-  <link rel="stylesheet" href="assets/css/pages.css">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles/main.css">
 </head>
 <body data-page="fishing">
   <noscript><div class="noscript-tip">本应用需要启用 JavaScript 才能运行，请检查浏览器设置。</div></noscript>
-  <aside class="rail">
-    <a class="brand" href="index.html" aria-label="车象 WeatherOS 首页">
-      <span class="logo-glyph" data-icon="cloud-lightning"></span><sup>°</sup>
-    </a>
-    <nav class="rail-nav" aria-label="主导航">
-      <a class="nav-item" data-nav="home" href="index.html" title="气象看板">
-        <span class="ni-icon" data-icon="layout-dashboard"></span><span class="ni-label">气象</span>
-      </a>
-      <a class="nav-item" data-nav="rainstorm" href="rainstorm.html" title="高速暴雨辅助">
-        <span class="ni-icon" data-icon="cloud-rain"></span><span class="ni-label">暴雨</span>
-      </a>
-      <a class="nav-item" data-nav="camping" href="camping.html" title="露营助手">
-        <span class="ni-icon" data-icon="tent"></span><span class="ni-label">露营</span>
-      </a>
-      <a class="nav-item" data-nav="flood" href="flood.html" title="山洪预警">
-        <span class="ni-icon" data-icon="mountain"></span><span class="ni-label">山洪</span>
-      </a>
-      <a class="nav-item" data-nav="fishing" href="fishing.html" title="钓鱼窗口">
-        <span class="ni-icon" data-icon="fish"></span><span class="ni-label">钓鱼</span>
-      </a>
-    </nav>
-    <div class="rail-foot">
-      <span class="sys"><span class="sys-dot"></span>SYS OK</span>
-      <span class="ver">DEMO v0.9</span>
-    </div>
-  </aside>
+  <!-- @include shell/rail.html -->
 
   <div class="workspace">
-    <header class="topbar">
-      <div class="tb-title">车象<span class="crumb">WEATHER OS</span></div>
-      <div class="tb-chips">
-        <span class="chip"><span class="chip-ic" data-icon="navigation"></span>G60 沪昆高速 · 嘉兴段</span>
-        <span class="chip"><span class="chip-ic" data-icon="car"></span>ACC <span class="chip-val">ON</span></span>
-        <span class="chip"><span class="chip-ic" data-icon="droplets"></span>传感器 <span class="chip-val">4/4</span></span>
-        <span class="chip"><span class="chip-ic" data-icon="thermometer"></span>车内 <span class="chip-val">22.5°</span></span>
-        <span class="chip"><span class="chip-ic" data-icon="wifi"></span>5G</span>
-      </div>
-      <div class="tb-clock"><span id="tbClock" class="mono">14:32:08</span><span id="tbDate" class="tb-date">10月26日 · 周日</span></div>
-    </header>
+    <!-- @include shell/topbar.html -->
 
     <main class="content">
       <section class="page-head stagger">
@@ -147,10 +108,6 @@
     </main>
   </div>
 
-  <script src="assets/js/icons.js"></script>
-  <script src="assets/data/mock.js"></script>
-  <script src="assets/api/api.js"></script>
-  <script src="assets/js/app.js"></script>
-  <script src="pages/fishing.js"></script>
+  <script type="module" src="./pages/fishing.js"></script>
 </body>
 </html>

@@ -1,6 +1,13 @@
 /* 首页 · 气象看板 */
-(async function () {
-  const { $, icons } = CW;
+import '../core/app.js';
+import { $, icons } from '../core/dom.js';
+import { Api } from '../api/api.js';
+
+function levelClass(i) {
+  return ['lv-light', 'lv-mid', 'lv-heavy', 'lv-storm'][i] || 'lv-mid';
+}
+
+async function renderDashboard() {
   const res = await Api.getDashboard();
   const d = res.data;
 
@@ -88,8 +95,6 @@
   }).join('');
 
   icons(document);
-})();
-
-function levelClass(i) {
-  return ['lv-light', 'lv-mid', 'lv-heavy', 'lv-storm'][i] || 'lv-mid';
 }
+
+renderDashboard();

@@ -19,7 +19,7 @@
   font-family: var(--display); font-weight: 800; font-size: 15px; letter-spacing: .5px;
   box-shadow: 0 0 24px -6px rgba(89,183,255,.5);
 }
-.brand .logo-glyph { display: flex; }
+.brand .logo-glyph { display: flex; width: 24px; height: 24px; }
 .brand sup { font-size: 7px; font-weight: 700; color: var(--aqua); margin-left: -6px; }
 .rail-nav { display: flex; flex-direction: column; gap: 8px; flex: 1; width: 100%; align-items: center; }
 .nav-item {
