@@ -3,6 +3,7 @@ import '../core/app.js';
 import { $, toast, animateNumber } from '../core/dom.js';
 import { DB } from '../data/mock.js';
 import { Api } from '../api/api.js';
+import { rainAssistPlan, canAssist, LEVEL_STRATEGY, MANUAL_FOLLOW_SECONDS } from '../domain/rainstorm.rules.js';
 
 const rs = DB.rainstorm;
 const rain = DB.rain;
@@ -39,16 +40,21 @@ $('#rsScale').innerHTML = rain.thresholds.map(function (t, i) {
     '<circle class="lc-dot" cx="' + lastX + '" cy="' + lastY + '" r="3.4"/>';
 })();
 
-/* ---------- 分级逻辑 ---------- */
+/* ---------- 分级逻辑（策略表由 domain 提供） ---------- */
 function renderLogic() {
-  const rows = rs.response.map(function (r) {
-    const current = r.index === rain.levelIndex;
+  const rows = LEVEL_STRATEGY.map(function (rule, i) {
+    const t = rain.thresholds[i];
+    const range = t.max == null
+      ? '≥ ' + t.min
+      : t.min === 0 ? '< ' + t.max : t.min + ' – ' + t.max;
+    const current = i === rain.levelIndex;
+    const speed = rule.speedDelta === 0 ? '限速值' : '−' + Math.abs(rule.speedDelta) + ' km/h';
     return (
       '<div class="lt-row' + (current ? ' is-current' : '') + '">' +
-        '<span class="lt-level"><i class="lt-dot"></i>' + r.level + '</span>' +
-        '<span class="mono">' + r.range + '</span>' +
-        '<b>' + r.speed + '</b>' +
-        '<b>' + r.gap + '</b>' +
+        '<span class="lt-level"><i class="lt-dot"></i>' + t.name + '</span>' +
+        '<span class="mono">' + range + ' mm/h</span>' +
+        '<b>' + speed + '</b>' +
+        '<b>' + rule.followSeconds.toFixed(1) + ' s</b>' +
       '</div>'
     );
   }).join('');
@@ -91,6 +97,14 @@ function nowTime() {
 }
 
 function applyState(on, persist) {
+  const plan = rainAssistPlan({
+    rate: rain.rate,
+    thresholds: rain.thresholds,
+    speedLimit: DB.vehicle.speedLimit,
+    currentSpeed: DB.vehicle.speed,
+    enabled: on
+  });
+
   card.classList.toggle('is-on', on);
   sw.setAttribute('aria-checked', String(on));
   pill.classList.toggle('is-ok', on);
@@ -98,20 +112,24 @@ function applyState(on, persist) {
   statusText.textContent = on ? '辅助介入中' : '辅助待命';
 
   $('#assistState').textContent = on ? '辅助介入中' : '辅助待命';
-  $('#assistHint').textContent = on ? '大雨档 · 策略已同步 ACC' : '雨量达到大雨阈值，可开启辅助';
-  animateNumber($('#avSpeed'), on ? rs.targetSpeed : DB.vehicle.speedLimit, 0);
-  $('#avSpeedNote').textContent = on ? '−20 km/h · 大雨档' : '当前限速';
-  animateNumber($('#avGap'), on ? rs.targetGap : 2.0, 1);
-  $('#avGapNote').textContent = on ? '+1.8 s · 安全冗余' : '手动模式';
+  $('#assistHint').textContent = on
+    ? plan.level + '档 · 策略已同步 ACC'
+    : (canAssist(rain.rate, rain.thresholds) ? '雨量达到大雨阈值，可开启辅助' : '当前雨量未达介入阈值');
 
-  speedLimit.textContent = on ? rs.targetSpeed : DB.vehicle.speedLimit;
-  const targetSpeed = on ? 82 : 96;
-  const targetFollow = on ? '88 m · 3.8 s' : '62 m · 2.3 s';
-  const targetGap = on ? '88 m' : '62 m';
-  animateNumber(speedVal, targetSpeed, 0);
-  speedArc.setAttribute('stroke-dasharray', ((targetSpeed / 120) * 100).toFixed(1) + ' 100');
-  followVal.textContent = targetFollow;
-  gapMeters.textContent = targetGap;
+  animateNumber($('#avSpeed'), plan.targetSpeed, 0);
+  $('#avSpeedNote').textContent = on
+    ? '−' + Math.abs(plan.speedDelta) + ' km/h · ' + plan.level + '档'
+    : '当前限速';
+  animateNumber($('#avGap'), plan.followSeconds, 1);
+  $('#avGapNote').textContent = on
+    ? '+' + (plan.followSeconds - MANUAL_FOLLOW_SECONDS).toFixed(1) + ' s · 安全冗余'
+    : '手动模式';
+
+  speedLimit.textContent = on ? plan.targetSpeed : DB.vehicle.speedLimit;
+  animateNumber(speedVal, plan.targetSpeed, 0);
+  speedArc.setAttribute('stroke-dasharray', plan.gaugePercent.toFixed(1) + ' 100');
+  followVal.textContent = plan.followMeters + ' m · ' + plan.followSeconds.toFixed(1) + ' s';
+  gapMeters.textContent = plan.followMeters + ' m';
   $('#assistLog').textContent = 'RS-04 · 最近同步 ' + nowTime() + (on ? ' · 策略生效' : '');
 
   if (persist) {
@@ -131,7 +149,9 @@ async function toggle() {
   events.unshift({
     time: nowTime(),
     title: res.data.enabled ? '暴雨辅助已开启' : '暴雨辅助已关闭',
-    desc: res.data.enabled ? '目标车速 80 km/h · 跟车距离 3.8 s' : '恢复手动模式 · 限速 100 km/h',
+    desc: res.data.enabled
+      ? '目标车速 ' + res.data.strategy.speedLimit + ' km/h · 跟车 ' + res.data.strategy.followMeters + ' m'
+      : '恢复手动模式 · 限速 ' + DB.vehicle.speedLimit + ' km/h',
     tone: res.data.enabled ? 'ok' : 'info'
   });
   renderEvents();

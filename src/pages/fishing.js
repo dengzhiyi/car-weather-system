@@ -3,13 +3,19 @@ import '../core/app.js';
 import { $, icons, animateNumber } from '../core/dom.js';
 import { DB } from '../data/mock.js';
 import { Api } from '../api/api.js';
+import { fishingScore, pressureStateOf } from '../domain/fishing.rules.js';
 
 let currentSpot = 'jiangjia';
 
-function toneOf(score) {
-  if (score >= 80) return { cls: 'ok', tag: 'tag-ok', pill: 'is-ok', text: '适宜出钓' };
-  if (score >= 65) return { cls: 'warn', tag: 'tag-warn', pill: 'is-warn', text: '较为适宜' };
-  return { cls: 'caution', tag: 'tag-danger', pill: 'is-danger', text: '谨慎出钓' };
+const TONE_CLASS = {
+  ok: { tag: 'tag-ok', pill: 'is-ok', text: '适宜出钓' },
+  warn: { tag: 'tag-warn', pill: 'is-warn', text: '较为适宜' },
+  caution: { tag: 'tag-danger', pill: 'is-danger', text: '谨慎出钓' }
+};
+
+function trendText(trend) {
+  const value = Number(trend) || 0;
+  return (value > 0 ? '+' : '') + value.toFixed(1) + ' / 24h';
 }
 
 /* 气压 24 小时趋势线 */
@@ -34,14 +40,21 @@ function drawSpark(values) {
 }
 
 function renderSpot(spot) {
-  const tone = toneOf(spot.score);
+  const score = fishingScore({
+    pressure: spot.pressure,
+    pressureTrend: spot.pressureTrend,
+    windSpeed: spot.windSpeed,
+    gust: spot.gust
+  });
+  const tone = TONE_CLASS[score.tone] || TONE_CLASS.caution;
+  const pressure = pressureStateOf(spot.pressureTrend);
 
   /* ---------- 评分 ---------- */
-  $('#scoreArc').style.strokeDasharray = spot.score + ' 100';
-  animateNumber($('#scoreVal'), spot.score, 0, '');
+  $('#scoreArc').style.strokeDasharray = score.score + ' 100';
+  animateNumber($('#scoreVal'), score.score, 0, '');
   const rating = $('#scoreRating');
-  rating.textContent = spot.rating;
-  rating.className = 'score-rating ' + (tone.cls === 'ok' ? '' : 'is-' + tone.cls);
+  rating.textContent = score.rating;
+  rating.className = 'score-rating ' + (score.tone === 'ok' ? '' : 'is-' + score.tone);
   const tag = $('#scoreTag');
   tag.textContent = tone.text;
   tag.className = 'ch-tag tag ' + tone.tag;
@@ -54,12 +67,11 @@ function renderSpot(spot) {
 
   /* ---------- 气压 / 风况 ---------- */
   animateNumber($('#pVal'), spot.pressure, 0, '');
-  $('#pDelta').textContent = spot.pressureTrend.replace(' hPa / 24h', ' / 24h');
-  $('#pStateTag').textContent = spot.pressureState;
-  $('#pStateTag').className = 'ch-tag tag ' + (spot.pressure > 1008 ? 'tag-ok' : 'tag-warn');
-  const falling = spot.pressureTrend.indexOf('-') === 0;
-  $('#pTrend').textContent = spot.pressureState + (falling ? ' · 鱼口偏弱，建议轻饵慢逗' : ' · 鱼口趋活跃');
-  $('#pTrend').className = 'p-trend' + (falling ? ' is-fall' : '');
+  $('#pDelta').textContent = trendText(spot.pressureTrend);
+  $('#pStateTag').textContent = pressure.label;
+  $('#pStateTag').className = 'ch-tag tag ' + (pressure.falling ? 'tag-warn' : 'tag-ok');
+  $('#pTrend').textContent = pressure.label + ' · ' + pressure.note;
+  $('#pTrend').className = 'p-trend' + (pressure.falling ? ' is-fall' : '');
   drawSpark(spot.pressureHistory);
 
   $('#windSpeed').textContent = spot.windSpeed.toFixed(1) + ' m/s';

@@ -4,6 +4,7 @@
  TODO: replace each body with real fetch calls.
 */
 import { DB } from '../data/mock.js';
+import { rainAssistPlan } from '../domain/rainstorm.rules.js';
 
 function delay(ms) {
   return new Promise(function (resolve) { setTimeout(resolve, ms); });
@@ -29,13 +30,23 @@ async function getDashboard() {
 async function setRainAssist(payload) {
   await delay(460);
   const enabled = !!payload.enabled;
+  const plan = rainAssistPlan({
+    rate: DB.rain.rate,
+    thresholds: DB.rain.thresholds,
+    speedLimit: DB.vehicle.speedLimit,
+    currentSpeed: DB.vehicle.speed,
+    enabled: enabled
+  });
   return {
     code: 0,
     data: {
-      enabled: enabled,
-      strategy: enabled
-        ? { speedLimit: DB.rainstorm.targetSpeed, followGap: DB.rainstorm.targetGap, notice: '暴雨辅助介入中' }
-        : { speedLimit: DB.vehicle.speedLimit, followGap: 2.0, notice: '暴雨辅助待命' },
+      enabled: plan.enabled,
+      strategy: {
+        speedLimit: plan.targetSpeed,
+        followGap: plan.followSeconds,
+        followMeters: plan.followMeters,
+        notice: plan.notice
+      },
       source: 'rain-sensor ' + DB.rain.sensorId,
       syncedAt: new Date().toISOString()
     }
@@ -73,7 +84,8 @@ async function planDestination(payload) {
   };
 }
 
-/* GET /api/flood/status?mode=normal|alert  → { destination, status, notify, history } */
+/* GET /api/flood/status?mode=normal|alert
+   → { destination, status:{ sensorRate, forecast, update }, thresholds, rainLevels, notify, history } */
 async function getFloodStatus(mode) {
   await delay(420);
   const key = mode === 'alert' ? 'alert' : 'normal';
@@ -82,13 +94,15 @@ async function getFloodStatus(mode) {
     data: {
       destination: DB.flood.destination,
       status: DB.flood.modes[key],
+      thresholds: DB.flood.thresholds,
+      rainLevels: DB.rain.thresholds,
       notify: DB.flood.notify,
       history: DB.flood.history
     }
   };
 }
 
-/* GET /api/fishing/window?spotId=  → { spot } */
+/* GET /api/fishing/window?spotId=  → { spot: { 原始气压/风速读数, windows, advice } } */
 async function getFishingWindow(spotId) {
   await delay(360);
   const spots = DB.fishing.spots;

@@ -2,17 +2,23 @@
 import '../core/app.js';
 import { $, $$, toast, icons } from '../core/dom.js';
 import { Api } from '../api/api.js';
-
-let currentMode = 'normal';
+import { evaluateFlood } from '../domain/flood.rules.js';
 
 /* 渲染主函数 */
 async function render(mode) {
-  currentMode = mode;
   const res = await Api.getFloodStatus(mode);
   if (res.code !== 0) return;
   const d = res.data;
-  const s = d.status;
   const dest = d.destination;
+
+  /* 双规则研判（domain 纯规则：传感器阈值 + 2h 预报阈值） */
+  const s = evaluateFlood({
+    sensorRate: d.status.sensorRate,
+    forecast: d.status.forecast,
+    thresholds: d.thresholds,
+    rainLevels: d.rainLevels,
+    update: d.status.update
+  });
 
   /* ---------- 风险研判环 ---------- */
   const riskArc = $('#riskArc');
@@ -24,30 +30,28 @@ async function render(mode) {
   $('#riskUpdate').textContent = s.update;
 
   const riskCard = $('#riskCard');
-  if (s.riskScore >= 70) riskCard.classList.add('is-high');
+  if (s.alert) riskCard.classList.add('is-high');
   else riskCard.classList.remove('is-high');
 
   const riskTag = $('#riskTag');
-  riskTag.textContent = s.riskScore >= 70 ? '双规则已触发' : '双规则未触发';
-  riskTag.className = 'ch-tag tag ' + (s.riskScore >= 70 ? 'tag-danger' : 'tag-ok');
+  riskTag.textContent = s.hits === 2 ? '双规则已触发' : s.hits === 1 ? '单规则命中' : '双规则未触发';
+  riskTag.className = 'ch-tag tag ' + (s.alert ? 'tag-danger' : 'tag-ok');
 
   /* ---------- 雨量监测 ---------- */
-  $('#monRate').textContent = s.sensorRate;
-  $('#monLevel').textContent = s.sensorLevel;
+  $('#monRate').textContent = s.sensorRate.toFixed(1);
   const monLevelPill = $('#monLevel');
-  const levelNames = ['小雨','中雨','大雨','暴雨'];
-  const levelClasses = ['lv-light','lv-mid','lv-heavy','lv-storm'];
-  const idx = levelNames.indexOf(s.sensorLevel);
-  levelClasses.forEach(function(c) { monLevelPill.classList.remove(c); });
-  if (idx > -1) monLevelPill.classList.add(levelClasses[idx]);
+  monLevelPill.textContent = s.sensorLevel;
+  const levelClasses = ['lv-light', 'lv-mid', 'lv-heavy', 'lv-storm'];
+  levelClasses.forEach(function (c) { monLevelPill.classList.remove(c); });
+  if (s.sensorLevelIndex > -1) monLevelPill.classList.add(levelClasses[s.sensorLevelIndex]);
 
   /* ---------- 预报柱 ---------- */
   const barsRoot = $('#forecastBars');
   barsRoot.innerHTML = '';
   const innerH = 84, topPad = 8;
   const maxVal = 70;
-  const thresholdVal = 50;
-  s.forecast.forEach(function (v) {
+  const thresholdVal = d.thresholds.forecastMm;
+  d.status.forecast.forEach(function (v) {
     const over = v >= thresholdVal;
     const bar = document.createElement('div');
     bar.className = 'fbar' + (over ? ' is-over' : '');
@@ -60,7 +64,7 @@ async function render(mode) {
   const thresholdLine = document.createElement('div');
   thresholdLine.className = 'fc-threshold';
   thresholdLine.style.top = (topPad + innerH - (thresholdVal / maxVal) * innerH) + 'px';
-  thresholdLine.innerHTML = '<span>50 mm</span>';
+  thresholdLine.innerHTML = '<span>' + thresholdVal + ' mm</span>';
   barsRoot.appendChild(thresholdLine);
   $('#forecastPeak').textContent = s.forecastPeak + ' mm';
   $('#monFootTime').textContent = '更新 ' + s.update;
@@ -98,24 +102,17 @@ async function render(mode) {
   $('#destResponse').textContent = dest.response;
 
   const destStatus = $('#destStatus');
-  destStatus.textContent = s.riskScore >= 70 ? '危险' : '安全';
-  destStatus.className = 'ch-tag tag ' + (s.riskScore >= 70 ? 'tag-danger' : 'tag-ok');
+  destStatus.textContent = s.alert ? '危险' : '安全';
+  destStatus.className = 'ch-tag tag ' + (s.alert ? 'tag-danger' : 'tag-ok');
 
-  /* ---------- 头部 pill + banner ---------- */
+  /* ---------- 头部 pill + banner（由规则判定驱动） ---------- */
   const floodPill = $('#floodPill');
   const floodPillText = $('#floodPillText');
   const alertBanner = $('#alertBanner');
-  if (mode === 'alert') {
-    floodPill.classList.remove('is-ok');
-    floodPill.classList.add('is-danger');
-    floodPillText.textContent = '高风险';
-    alertBanner.hidden = false;
-  } else {
-    floodPill.classList.remove('is-danger');
-    floodPill.classList.add('is-ok');
-    floodPillText.textContent = '低风险';
-    alertBanner.hidden = true;
-  }
+  floodPill.classList.toggle('is-danger', s.alert);
+  floodPill.classList.toggle('is-ok', !s.alert);
+  floodPillText.textContent = s.level;
+  alertBanner.hidden = !s.alert;
 }
 
 /* ---------- 演示 seg 切换 ---------- */
@@ -139,4 +136,3 @@ $('#muteBtn').addEventListener('click', function () {
 
 /* ---------- 首次载入 ---------- */
 render('normal');
-

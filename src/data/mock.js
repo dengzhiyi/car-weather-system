@@ -91,18 +91,8 @@ const DB = {
 
   /* ---------- 高速暴雨辅助 ---------- */
   rainstorm: {
-    targetSpeed: 80,
-    targetGap: 3.8,
-    followMeters: 62,
-    followSeconds: 2.3,
     accStatus: 'ACC 已激活',
     laneStatus: '车道保持中',
-    response: [
-      { level: '小雨', range: '< 2.5 mm/h', speed: '限速值', gap: '2.0 s', index: 0 },
-      { level: '中雨', range: '2.5 – 8 mm/h', speed: '−10 km/h', gap: '2.5 s', index: 1 },
-      { level: '大雨', range: '8 – 16 mm/h', speed: '−20 km/h', gap: '3.8 s', index: 2 },
-      { level: '暴雨', range: '≥ 16 mm/h', speed: '−30 km/h', gap: '4.5 s', index: 3 }
-    ],
     events: [
       { time: '14:32:08', title: '雨量传感器 RS-04 采样异常波动', desc: '瞬时值 18.2 mm/h，持续 4 秒后回落', tone: 'warn' },
       { time: '14:21:40', title: '路段降水增强', desc: '雨量由 6.4 mm/h 升至 11.2 mm/h', tone: 'info' },
@@ -213,36 +203,18 @@ const DB = {
       response: '18 min',
       camps: '3 处营地'
     },
+    /* 流域阈值：瞬时面雨量 / 2h 累计雨量（mm），与高速雨量等级阈值不同口径 */
+    thresholds: { stormRate: 50, forecastMm: 50 },
     modes: {
       normal: {
-        riskScore: 34,
-        level: '低风险',
-        levelEn: 'LOW RISK',
         sensorRate: 12.6,
-        sensorLevel: '大雨',
         forecast: [2, 4, 7, 9],
-        forecastPeak: 9,
-        summary: '当前流域降水平稳，传感器与预报均未达到预警阈值。',
-        update: '14:32:08',
-        rules: [
-          { id: 'rule1', name: '雨量传感器 > 暴雨阈值', detail: '当前 12.6 mm/h / 阈值 50 mm/h', hit: false },
-          { id: 'rule2', name: '未来 2 小时暴雨预报', detail: '预计 2h 累计 9 mm / 阈值 50 mm', hit: false }
-        ]
+        update: '14:32:08'
       },
       alert: {
-        riskScore: 88,
-        level: '高风险',
-        levelEn: 'HIGH RISK',
         sensorRate: 52.4,
-        sensorLevel: '暴雨',
         forecast: [18, 32, 46, 68],
-        forecastPeak: 68,
-        summary: '雨量传感器已超暴雨阈值，且未来 2 小时流域累计降水 68 mm，触发双规则预警。',
-        update: '14:36:20',
-        rules: [
-          { id: 'rule1', name: '雨量传感器 > 暴雨阈值', detail: '当前 52.4 mm/h / 阈值 50 mm/h', hit: true },
-          { id: 'rule2', name: '未来 2 小时暴雨预报', detail: '预计 2h 累计 68 mm / 阈值 50 mm', hit: true }
-        ]
+        update: '14:36:20'
       }
     },
     notify: [
@@ -264,12 +236,9 @@ const DB = {
         id: 'jiangjia',
         name: '姜家湾',
         region: '千岛湖 · 西南湖湾',
-        score: 82,
-        rating: '适宜垂钓',
         bestWindow: '17:00 – 19:00',
         pressure: 1012,
-        pressureTrend: '+3.2 hPa / 24h',
-        pressureState: '持续回升',
+        pressureTrend: 3.2,
         pressureHistory: [1005, 1006, 1006, 1007, 1008, 1009, 1009, 1010, 1011, 1011, 1012, 1012],
         windSpeed: 3.2,
         windDir: '东南风',
@@ -296,12 +265,9 @@ const DB = {
         id: 'jieshou',
         name: '界首湾',
         region: '千岛湖 · 北岸湾区',
-        score: 74,
-        rating: '较为适宜',
         bestWindow: '05:00 – 07:00',
         pressure: 1009,
-        pressureTrend: '+0.4 hPa / 24h',
-        pressureState: '基本稳定',
+        pressureTrend: 0.4,
         pressureHistory: [1008, 1008, 1009, 1009, 1008, 1009, 1009, 1010, 1009, 1009, 1009, 1009],
         windSpeed: 4.1,
         windDir: '偏东风',
@@ -328,12 +294,9 @@ const DB = {
         id: 'zitong',
         name: '梓桐溪',
         region: '千岛湖 · 上游溪流',
-        score: 63,
-        rating: '谨慎出钓',
         bestWindow: '06:00 – 08:00',
         pressure: 1004,
-        pressureTrend: '-2.6 hPa / 24h',
-        pressureState: '缓慢下降',
+        pressureTrend: -2.6,
         pressureHistory: [1011, 1010, 1010, 1009, 1008, 1008, 1007, 1006, 1006, 1005, 1005, 1004],
         windSpeed: 2.1,
         windDir: '偏北风',
