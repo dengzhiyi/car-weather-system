@@ -77,7 +77,7 @@ npm test          # 运行 domain 规则单测
 
 ## 天气数据接入
 
-首页实况与未来 2 小时预报取自天气服务 `https://api.tjweather.com/v2`，默认监测点为 **深圳坪山 · 比亚迪总部**（`114.355782, 22.680820`），可在 [site.js](file:///workspace/car-weather-system/src/config/site.js) 修改。
+首页实况与未来 4 小时逐时预报取自天气服务 `https://api.tjweather.com/v2`，默认监测点为 **深圳坪山 · 比亚迪总部**（`114.355782, 22.680820`），可在 [site.js](file:///workspace/car-weather-system/src/config/site.js) 修改。
 
 | 项 | 说明 |
 |---|---|
