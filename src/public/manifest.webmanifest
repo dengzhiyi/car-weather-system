@@ -1,6 +1,6 @@
 {
-  "name": "车象 WeatherOS",
-  "short_name": "车象气象",
+  "name": "气象环境助手",
+  "short_name": "气象环境助手",
   "description": "车载气象监测系统：实时看板、暴雨辅助、露营助手、山洪预警、钓鱼窗口",
   "lang": "zh-CN",
   "dir": "ltr",

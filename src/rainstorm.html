@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>高速暴雨辅助 · 车象 WeatherOS</title>
+  <title>高速暴雨辅助 · 气象环境助手</title>
   <meta name="theme-color" content="#060B10">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
@@ -19,9 +19,10 @@
     <main class="content">
       <section class="page-head stagger">
         <div class="ph-main">
-          <span class="eyebrow">02 / 自适应驾驶</span>
-          <h1 class="page-title">高速暴雨辅助</h1>
-          <p class="page-sub">雨量传感器 → 目标车速 / 跟车距离自动联动 · RS-04 · 采样 1 Hz</p>
+          <div class="ph-title">
+            <h1 class="page-title">高速暴雨辅助</h1>
+            <button class="help-btn" type="button" data-help="接收雨量传感器实时读数并判定雨量等级；开启辅助后，车机按下雨量自动下调目标车速、扩大跟车距离，并同步 ACC 与制动预充压。" aria-label="查看功能说明" aria-expanded="false"><span data-icon="circle-help"></span></button>
+          </div>
         </div>
         <div class="head-actions">
           <span class="status-pill is-off" id="assistStatusPill"><span class="live-dot"></span><span id="assistStatusText">辅助待命</span></span>
@@ -55,7 +56,6 @@
         <article class="card assist-card" id="assistCard">
           <div class="assist-head">
             <div>
-              <span class="eyebrow">RAIN PILOT</span>
               <h3>暴雨辅助</h3>
             </div>
             <div class="switch" id="assistSwitch" role="switch" aria-checked="false" tabindex="0" aria-label="暴雨辅助开关"><span class="knob"></span></div>

@@ -1,4 +1,4 @@
-/* 车象 WeatherOS · 钓鱼窗口页 */
+/* 气象环境助手 · 钓鱼窗口页 */
 import '../core/app.js';
 import { $, icons, animateNumber } from '../core/dom.js';
 import { DB } from '../data/mock.js';

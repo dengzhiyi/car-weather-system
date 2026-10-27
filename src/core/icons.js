@@ -1,4 +1,4 @@
-/* 车象 WeatherOS · 本地 Lucide 图标（内联 SVG，无 CDN，可离线） */
+/* 气象环境助手 · 本地 Lucide 图标（内联 SVG，无 CDN，可离线） */
 const P = {
   'layout-dashboard':
     '<rect width="7" height="9" x="3" y="3" rx="1.4"/><rect width="7" height="5" x="14" y="3" rx="1.4"/><rect width="7" height="9" x="14" y="12" rx="1.4"/><rect width="7" height="5" x="3" y="16" rx="1.4"/>',
@@ -55,6 +55,8 @@ const P = {
   moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
   'circle-check': '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
   'circle-alert': '<circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+  'circle-help':
+    '<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
   siren:
     '<path d="M7 18v-6a5 5 0 1 1 10 0v6"/><path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z"/><path d="M21 12h1"/><path d="M18.5 4.5 18 5"/><path d="M2 12h1"/><path d="M12 2v1"/><path d="m4.93 4.93.7.7"/>',
   history:

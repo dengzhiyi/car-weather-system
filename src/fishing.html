@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>钓鱼窗口 · 车象 WeatherOS</title>
+  <title>钓鱼窗口 · 气象环境助手</title>
   <meta name="theme-color" content="#060B10">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
@@ -19,9 +19,10 @@
     <main class="content">
       <section class="page-head stagger">
         <div class="ph-main">
-          <span class="eyebrow">05 / 休闲垂钓</span>
-          <h1 class="page-title">钓鱼窗口</h1>
-          <p class="page-sub">依据气压变化与风速评估出钓时机 · 车载气压计 + 湖面风况</p>
+          <div class="ph-title">
+            <h1 class="page-title">钓鱼窗口</h1>
+            <button class="help-btn" type="button" data-help="依据目的地 24 小时气压变化与水面风速评估出钓时机，给出综合评分、当日最佳时段，以及钓位、饵料和安全建议。" aria-label="查看功能说明" aria-expanded="false"><span data-icon="circle-help"></span></button>
+          </div>
         </div>
         <div class="head-actions">
           <span class="status-pill is-ok" id="fishPill"><span class="live-dot"></span><span id="fishPillText">适宜出钓</span></span>
@@ -41,7 +42,7 @@
               <circle class="sr-track" cx="60" cy="60" r="50" pathLength="100"></circle>
               <circle class="sr-fill" id="scoreArc" cx="60" cy="60" r="50" pathLength="100" stroke-dasharray="82 100"></circle>
             </svg>
-            <div class="score-center"><b id="scoreVal">82</b><span>FISHING SCORE</span></div>
+            <div class="score-center"><b id="scoreVal">82</b><span>满分 100</span></div>
           </div>
           <div class="score-rating" id="scoreRating">适宜垂钓</div>
           <div class="best-window"><span data-icon="clock"></span>最佳时段 <b id="bestWindow">17:00 – 19:00</b></div>

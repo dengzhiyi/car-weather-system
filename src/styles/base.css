@@ -4,6 +4,8 @@
    ============================================================ */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
+/* 根字号由 --ui-scale 驱动，字号令牌全部使用 rem，实现整屏等比缩放 */
+html { font-size: calc(16px * var(--ui-scale)); }
 body {
   font-family: var(--body);
   background:
@@ -11,7 +13,7 @@ body {
     radial-gradient(900px 600px at -10% 40%, rgba(47,217,192,.06), transparent 55%),
     var(--bg);
   color: var(--text);
-  font-size: 14px;
+  font-size: var(--fs-base);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -49,8 +51,8 @@ input, select { font-family: inherit; }
 
 /* ---------- 工具类 ---------- */
 .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-.num-lg { font-family: var(--display); font-size: 40px; font-weight: 800; letter-spacing: .5px; line-height: 1; font-variant-numeric: tabular-nums; }
-.num-xl { font-family: var(--display); font-size: 76px; font-weight: 800; letter-spacing: .5px; line-height: 1; font-variant-numeric: tabular-nums; }
+.num-lg { font-family: var(--display); font-size: 2.5rem; font-weight: 800; letter-spacing: .5px; line-height: 1; font-variant-numeric: tabular-nums; }
+.num-xl { font-family: var(--display); font-size: 4.75rem; font-weight: 800; letter-spacing: .5px; line-height: 1; font-variant-numeric: tabular-nums; }
 .dim { color: var(--text-dim); }
 .sub { color: var(--text-sub); }
 .row { display: flex; align-items: center; }

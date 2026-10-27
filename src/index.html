@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>气象看板 · 车象 WeatherOS</title>
+  <title>气象看板 · 气象环境助手</title>
   <meta name="theme-color" content="#060B10">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
@@ -19,19 +19,13 @@
     <main class="content">
       <section class="page-head stagger">
         <div class="ph-main">
-          <span class="eyebrow">01 / 实时监测</span>
-          <h1 class="page-title">气象看板</h1>
-          <p class="page-sub">深圳 · 坪山 比亚迪总部 · 多传感器融合 · 更新于 <span class="mono" id="updatedAt">14:32:08</span></p>
+          <div class="ph-title">
+            <h1 class="page-title">气象看板</h1>
+            <button class="help-btn" type="button" data-help="融合车载雨量传感器与实时天气接口，展示当前位置的实况、未来 2 小时降水与雨量等级，以及风速、气压、能见度、湿度等行车环境指标。" aria-label="查看功能说明" aria-expanded="false"><span data-icon="circle-help"></span></button>
+          </div>
         </div>
-        <div class="head-meta">
-          <div class="head-stat">
-            <span class="hs-label">数据链路</span>
-            <span class="hs-val is-ok"><span class="live-dot"></span>稳定 · 0.8 s</span>
-          </div>
-          <div class="head-stat">
-            <span class="hs-label">雨量传感器</span>
-            <span class="hs-val">RS-04 · 在线</span>
-          </div>
+        <div class="head-actions">
+          <span class="status-pill is-ok"><span class="live-dot"></span>数据更新于 <b class="mono" id="updatedAt">14:32:08</b></span>
         </div>
       </section>
 
@@ -120,8 +114,7 @@
 
       <section class="feature-strip stagger">
         <div class="strip-head">
-          <h2 class="strip-title">功能入口 <span>/ QUICK ACCESS</span></h2>
-          <span class="strip-hint"><span data-icon="refresh-cw"></span>传感器数据已同步至各模块</span>
+          <h2 class="strip-title">功能入口</h2>
         </div>
         <div class="feature-grid" id="featureGrid"></div>
       </section>

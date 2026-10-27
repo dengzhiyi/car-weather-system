@@ -1,4 +1,4 @@
-/* 车象 WeatherOS · API stub 层
+/* 气象环境助手 · API stub 层
  说明：以下函数签名即未来真实接口形状，内部通过 adapters 取数、通过 domain 计算，均带模拟网络时延。
  接入后端时只需替换 adapters 的实现，保持本层入参 / 返回结构不变。
  TODO: replace adapters with real data sources.

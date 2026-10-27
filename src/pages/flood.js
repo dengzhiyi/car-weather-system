@@ -1,4 +1,4 @@
-/* 车象 WeatherOS · 山洪预警页 */
+/* 气象环境助手 · 山洪预警页 */
 import '../core/app.js';
 import { $, $$, toast, icons } from '../core/dom.js';
 import { Api } from '../api/api.js';
@@ -25,7 +25,6 @@ async function render(mode) {
   $('#riskScore').textContent = s.riskScore;
   riskArc.style.strokeDasharray = `${s.riskScore} 100`;
   $('#riskLevel').textContent = s.level;
-  $('#riskEn').textContent = s.levelEn;
   $('#riskSummary').textContent = s.summary;
   $('#riskUpdate').textContent = s.update;
 

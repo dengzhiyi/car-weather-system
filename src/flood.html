@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>山洪预警 · 车象 WeatherOS</title>
+  <title>山洪预警 · 气象环境助手</title>
   <meta name="theme-color" content="#060B10">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
@@ -19,9 +19,10 @@
     <main class="content">
       <section class="page-head stagger">
         <div class="ph-main">
-          <span class="eyebrow">04 / 流域安全</span>
-          <h1 class="page-title">山洪预警</h1>
-          <p class="page-sub">目的地实时雨量 + 未来 2 小时短临预报 · 双规则联动判定</p>
+          <div class="ph-title">
+            <h1 class="page-title">山洪预警</h1>
+            <button class="help-btn" type="button" data-help="实时监测目的地流域降水：车载雨量传感器与未来 2 小时短临预报双规则联动，任一指标超过暴雨阈值即发出山洪预警并给出避险建议。" aria-label="查看功能说明" aria-expanded="false"><span data-icon="circle-help"></span></button>
+          </div>
         </div>
         <div class="head-actions">
           <span class="status-pill is-ok" id="floodPill"><span class="live-dot"></span><span id="floodPillText">低风险</span></span>
@@ -36,7 +37,7 @@
       <div class="alert-banner" id="alertBanner" hidden>
         <span class="ab-ic" data-icon="siren"></span>
         <div class="ab-copy">
-          <b>山洪橙色预警 · 莫干山后坞溪谷</b>
+          <b>山洪橙色预警 · 深圳七娘山溪谷</b>
           <p>雨量传感器 52.4 mm/h 已超暴雨阈值，未来 2 小时流域累计降水 68 mm，建议立即驶离沟谷。</p>
         </div>
         <div class="ab-actions">
@@ -59,11 +60,10 @@
                   <circle class="rr-track" cx="60" cy="60" r="50" pathLength="100"></circle>
                   <circle class="rr-fill" id="riskArc" cx="60" cy="60" r="50" pathLength="100" stroke-dasharray="34 100"></circle>
                 </svg>
-                <div class="risk-center"><b id="riskScore">34</b><span>RISK / 100</span></div>
+                <div class="risk-center"><b id="riskScore">34</b><span>风险分</span></div>
               </div>
               <div class="risk-meta">
                 <div class="risk-level" id="riskLevel">低风险</div>
-                <div class="risk-en" id="riskEn">LOW RISK</div>
                 <p class="risk-summary" id="riskSummary">当前流域降水平稳，传感器与预报均未达到预警阈值。</p>
                 <div class="risk-update">最近研判 <span id="riskUpdate">14:32:08</span></div>
               </div>
@@ -121,8 +121,8 @@
             </div>
             <div class="dest-title">
               <div>
-                <h3 id="destName">莫干山 · 后坞溪谷</h3>
-                <span class="dim mono" id="destCoord">30.6338° N, 119.8682° E</span>
+                <h3 id="destName">深圳 · 七娘山溪谷</h3>
+                <span class="dim mono" id="destCoord">22.5388° N, 114.5286° E</span>
               </div>
             </div>
             <div class="dest-terrain">
@@ -137,15 +137,13 @@
                 <path d="M96 96 C120 74 128 62 160 50 C188 40 200 26 214 4" fill="none" stroke="#2E7C91" stroke-width="2" stroke-dasharray="4 4"></path>
                 <circle cx="160" cy="50" r="4" fill="#FFB35C"></circle>
                 <circle cx="160" cy="50" r="9" fill="none" stroke="rgba(255,179,92,.5)" stroke-width="1"></circle>
-                <text x="172" y="46" fill="#C7A176" font-size="9">后坞溪谷</text>
-                <text x="16" y="18" fill="#3F6B57" font-size="8" letter-spacing="1">上游集水区</text>
               </svg>
             </div>
             <div class="dest-meta">
-              <div><span>距离</span><b id="destDistance">68 km</b></div>
+              <div><span>距离</span><b id="destDistance">34 km</b></div>
               <div><span>地形</span><b id="destTerrain">沟谷汇水区</b></div>
-              <div><span>海拔</span><b id="destElevation">420 m</b></div>
-              <div><span>响应时间</span><b id="destResponse">18 min</b></div>
+              <div><span>海拔</span><b id="destElevation">620 m</b></div>
+              <div><span>响应时间</span><b id="destResponse">14 min</b></div>
             </div>
           </article>
 

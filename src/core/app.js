@@ -11,6 +11,33 @@ $$('.nav-item').forEach(function (link) {
   if (link.dataset.nav === page) link.setAttribute('aria-current', 'page');
 });
 
+/* ---------- 页面说明浮层（标题旁「?」，默认隐藏，点击查看） ---------- */
+const helpBtn = $('.help-btn');
+if (helpBtn) {
+  const pop = document.createElement('div');
+  pop.className = 'help-pop';
+  pop.setAttribute('role', 'tooltip');
+  pop.textContent = helpBtn.getAttribute('data-help') || '';
+  pop.hidden = true;
+  helpBtn.parentNode.appendChild(pop);
+  const closeHelp = function () {
+    pop.hidden = true;
+    helpBtn.setAttribute('aria-expanded', 'false');
+  };
+  helpBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    const willOpen = pop.hidden;
+    pop.hidden = !willOpen;
+    helpBtn.setAttribute('aria-expanded', String(willOpen));
+  });
+  document.addEventListener('click', function (e) {
+    if (!pop.hidden && !pop.contains(e.target)) closeHelp();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeHelp();
+  });
+}
+
 /* ---------- 时钟 ---------- */
 const dateEl = $('#tbDate');
 const clockEl = $('#tbClock');

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>露营助手 · 车象 WeatherOS</title>
+  <title>露营助手 · 气象环境助手</title>
   <meta name="theme-color" content="#060B10">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
@@ -19,13 +19,13 @@
     <main class="content">
       <section class="page-head stagger">
         <div class="ph-main">
-          <span class="eyebrow">03 / 目的地气象</span>
-          <h1 class="page-title">露营助手</h1>
-          <p class="page-sub">与高德地图联动 · 设定目的地后自动获取到达时刻天气与露营建议</p>
+          <div class="ph-title">
+            <h1 class="page-title">露营助手</h1>
+            <button class="help-btn" type="button" data-help="与高德地图联动，设定目的地后自动获取到达时刻的天气、舒适度、装备与安全建议。" aria-label="查看功能说明" aria-expanded="false"><span data-icon="circle-help"></span></button>
+          </div>
         </div>
         <div class="head-actions">
-          <span class="tag tag-ok"><span class="live-dot"></span>高德地图已连接</span>
-          <span class="status-pill" id="campStatus"><span data-icon="route"></span><span id="campStatusText">目的地：莫干山云起营地</span></span>
+          <span class="status-pill" id="campStatus"><span data-icon="route"></span><span id="campStatusText">目的地：大鹏半岛西涌营地</span></span>
         </div>
       </section>
 
@@ -77,7 +77,7 @@
               <circle cx="120" cy="432" r="22" fill="rgba(47,217,192,.12)"></circle>
               <circle cx="120" cy="432" r="8" fill="#2FD9C0" stroke="#071219" stroke-width="2"></circle>
               <circle cx="120" cy="432" r="3" fill="#ffffff"></circle>
-              <text x="144" y="437" fill="#A9C3D6" font-size="11">当前位置</text>
+              <text x="144" y="437" fill="#A9C3D6" font-size="14">当前位置</text>
 
               <g transform="translate(612 192)">
                 <circle r="30" fill="rgba(255,179,92,.10)"></circle>
@@ -85,27 +85,26 @@
                 <path d="M0 -4 C-10 -18 -13 -24 -13 -30 A13 13 0 1 1 13 -30 C13 -24 10 -18 0 -4Z" transform="translate(0 8)" fill="#FFB35C" stroke="#0B1720" stroke-width="2"></path>
                 <circle cy="-30" r="4.5" fill="#0B1720"></circle>
               </g>
-              <text id="mapDestLabel" x="640" y="168" fill="#FFD7A6" font-size="12">莫干山云起营地</text>
-              <text x="640" y="184" fill="#7C94A7" font-size="9.5">海拔 420 m · 营地</text>
+              <text id="mapDestLabel" x="640" y="166" fill="#FFD7A6" font-size="15">大鹏半岛西涌营地</text>
+              <text x="640" y="186" fill="#7C94A7" font-size="12">海拔 20 m · 海滨营地</text>
 
-              <text x="360" y="452" fill="#5E7689" font-size="9" transform="rotate(-14 360 452)">S304</text>
-              <text x="470" y="300" fill="#5E7689" font-size="9" transform="rotate(-28 470 300)">G25 长深高速</text>
-              <text x="118" y="300" fill="#3F6B57" font-size="10" letter-spacing="2">莫干山风景区</text>
-              <text x="46" y="472" fill="#2E6478" font-size="9">对河口水库</text>
+              <text x="360" y="452" fill="#5E7689" font-size="12" transform="rotate(-14 360 452)">坪葵路</text>
+              <text x="470" y="300" fill="#5E7689" font-size="12" transform="rotate(-28 470 300)">惠深沿海高速</text>
+              <text x="74" y="300" fill="#3F6B57" font-size="12" letter-spacing="1">大鹏半岛地质公园</text>
+              <text x="40" y="440" fill="#2E6478" font-size="12">大鹏湾</text>
 
-              <g transform="translate(760 40)">
+              <g transform="translate(756 330)">
                 <path d="M0 16 L0 -8 M0 -8 L-5 0 M0 -8 L5 0" fill="none" stroke="#93A7B8" stroke-width="1.2"></path>
-                <text x="-3" y="27" fill="#93A7B8" font-size="8">N</text>
+                <text x="-3" y="30" fill="#93A7B8" font-size="11">N</text>
               </g>
             </svg>
             <span class="map-scale">1 km</span>
-            <span class="map-chip map-dest"><span data-icon="flag"></span><span id="mapDestChip">莫干山云起营地</span></span>
-            <span class="map-chip map-dist"><span data-icon="route"></span><span id="mapDistance">68 km</span> · <span id="mapDuration">1 小时 12 分</span></span>
+            <span class="map-chip map-dest"><span data-icon="flag"></span><span id="mapDestChip">大鹏半岛西涌营地</span></span>
+            <span class="map-chip map-dist"><span data-icon="route"></span><span id="mapDistance">58 km</span> · <span id="mapDuration">1 小时 05 分</span></span>
             <div class="map-zoom">
               <button id="zoomIn" type="button" aria-label="放大地图"><span data-icon="plus"></span></button>
               <button id="zoomOut" type="button" aria-label="缩小地图"><span data-icon="minus"></span></button>
             </div>
-            <span class="map-watermark">高德地图 · 示意</span>
           </div>
         </article>
 
@@ -119,19 +118,18 @@
             <div class="search-row">
               <div class="search-box" id="searchBox">
                 <span data-icon="search"></span>
-                <input class="dest-input" id="destInput" value="莫干山云起营地" placeholder="搜索目的地 / 营地" aria-label="搜索目的地" autocomplete="off">
+                <input class="dest-input" id="destInput" value="大鹏半岛西涌营地" placeholder="搜索目的地 / 营地" aria-label="搜索目的地" autocomplete="off">
               </div>
               <button class="btn" id="planBtn" type="button">设定<span data-icon="arrow-up-right"></span></button>
             </div>
             <p class="field-error" id="destError"></p>
             <div class="quick-chips" id="destChips"></div>
-            <div class="plan-meta"><span data-icon="route"></span><span id="routeMeta">68 km · 1 小时 12 分 · 预计 16:20 到达</span></div>
+            <div class="plan-meta"><span data-icon="route"></span><span id="routeMeta">58 km · 1 小时 05 分 · 预计 16:15 到达</span></div>
           </article>
 
           <article class="card arrival-card" id="arrivalCard">
             <div class="arrival-head">
               <div>
-                <span class="eyebrow">ARRIVAL WEATHER</span>
                 <h3>到达天气</h3>
               </div>
               <span class="tag tag-warn" id="arrBadge">雷雨</span>
@@ -167,7 +165,7 @@
         <div class="card-head">
           <span class="ch-ic" data-icon="leaf"></span>
           <h3>露营建议</h3>
-          <span class="ch-tag tag tag-dim" id="adviceDest">莫干山云起营地</span>
+          <span class="ch-tag tag tag-dim" id="adviceDest">大鹏半岛西涌营地</span>
         </div>
         <div class="advice-grid">
           <div class="advice-block">

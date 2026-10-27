@@ -1,8 +1,17 @@
 /* ============================================================
    01 · 设计令牌（Design Tokens）
    只放变量，不放任何选择器。所有页面共用，禁止在页面内覆盖。
+
+   屏幕适配：
+   基准为比亚迪车机 12.8″ / 1920×1080。12.8″ 与 15.6″ 分辨率相同，
+   浏览器无法区分物理尺寸，故按 12.8″ 定尺，字号统一走 rem 令牌，
+   切换屏幕时只需改 --ui-scale（15.6″ 建议 0.85，保持文字物理大小接近）。
    ============================================================ */
 :root {
+  /* ---------- 屏幕缩放 ---------- */
+  --ui-scale: 1;
+
+  /* ---------- 颜色 ---------- */
   --bg: #060B10;
   --bg-2: #0A1219;
   --surface: rgba(17, 28, 39, 0.78);
@@ -10,8 +19,8 @@
   --border: rgba(148, 180, 204, 0.13);
   --border-strong: rgba(148, 180, 204, 0.26);
   --text: #EDF4F9;
-  --text-sub: #93A7B8;
-  --text-dim: #63798B;
+  --text-sub: #A6B9C8;
+  --text-dim: #7B90A2;
   --primary: #59B7FF;
   --primary-hover: #86CEFF;
   --primary-deep: #1D6C9F;
@@ -19,10 +28,27 @@
   --amber: #FFB35C;
   --ok: #45D68A;
   --danger: #FF5F5F;
-  --display: "Bahnschrift","DIN Alternate","HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+
+  /* ---------- 字体 ---------- */
+  --display: "HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
   --body: "PingFang SC","HarmonyOS Sans SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
-  --mono: "JetBrains Mono","SFMono-Regular","Cascadia Mono","Roboto Mono",ui-monospace,monospace;
-  --rail-w: 92px;
+  --mono: "JetBrains Mono","Cascadia Mono","Roboto Mono",ui-monospace,monospace;
+
+  /* ---------- 字号阶梯（rem，随 --ui-scale 整体缩放） ---------- */
+  --fs-3xs: 0.75rem;    /* 12px · 最小字号 */
+  --fs-2xs: 0.8125rem;  /* 13px */
+  --fs-xs: 0.875rem;    /* 14px */
+  --fs-sm: 0.9375rem;   /* 15px */
+  --fs-base: 1rem;      /* 16px · 正文 */
+  --fs-md: 1.125rem;    /* 18px */
+  --fs-lg: 1.25rem;     /* 20px */
+  --fs-xl: 1.5rem;      /* 24px */
+  --fs-2xl: 1.75rem;    /* 28px */
+  --fs-3xl: 2.125rem;   /* 34px */
+
+  /* ---------- 尺寸 ---------- */
+  --rail-w: 108px;
+  --tap-min: 44px;      /* 车机最小触控高度 */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;

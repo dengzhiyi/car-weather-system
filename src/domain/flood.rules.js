@@ -15,11 +15,7 @@ const SCORE_SENSOR_WEIGHT = 45;
 const SCORE_FORECAST_WEIGHT = 24;
 
 /* 触发规则数 → 风险等级 */
-const LEVELS = [
-  { level: '低风险', levelEn: 'LOW RISK' },
-  { level: '中风险', levelEn: 'MEDIUM RISK' },
-  { level: '高风险', levelEn: 'HIGH RISK' }
-];
+const LEVELS = ['低风险', '中风险', '高风险'];
 
 function summaryOf(hits, sensorHit, peak) {
   if (hits === 2) {
@@ -66,7 +62,7 @@ function evaluateFlood(input) {
   ];
 
   const hits = (sensorHit ? 1 : 0) + (forecastHit ? 1 : 0);
-  const severity = LEVELS[Math.min(hits, LEVELS.length - 1)];
+  const level = LEVELS[Math.min(hits, LEVELS.length - 1)];
   const sensorLevel = input.rainLevels ? rainLevelOf(sensorRate, input.rainLevels) : null;
   const riskScore = Math.min(
     100,
@@ -81,8 +77,7 @@ function evaluateFlood(input) {
     riskScore: riskScore,
     hits: hits,
     alert: hits > 0,
-    level: severity.level,
-    levelEn: severity.levelEn,
+    level: level,
     summary: summaryOf(hits, sensorHit, peak),
     rules: rules,
     forecastPeak: peak,

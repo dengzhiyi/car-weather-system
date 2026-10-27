@@ -26,7 +26,6 @@ describe('evaluateFlood · 常态', () => {
   it('风险分与等级落在低风险区间', () => {
     expect(result.riskScore).toBe(34);
     expect(result.level).toBe('低风险');
-    expect(result.levelEn).toBe('LOW RISK');
     expect(result.summary).toContain('均未达到预警阈值');
   });
 
@@ -44,7 +43,6 @@ describe('evaluateFlood · 预警', () => {
     expect(result.alert).toBe(true);
     expect(result.rules.map((r) => r.hit)).toEqual([true, true]);
     expect(result.level).toBe('高风险');
-    expect(result.levelEn).toBe('HIGH RISK');
     expect(result.riskScore).toBe(88);
   });
 
@@ -69,7 +67,6 @@ describe('evaluateFlood · 单规则', () => {
     expect(result.hits).toBe(1);
     expect(result.alert).toBe(true);
     expect(result.level).toBe('中风险');
-    expect(result.levelEn).toBe('MEDIUM RISK');
     expect(result.summary).toContain('传感器已超暴雨阈值');
   });
 
@@ -104,5 +101,6 @@ describe('evaluateFlood · 数据健壮性', () => {
 
   it('等级表覆盖 0 / 1 / 2 条命中', () => {
     expect(LEVELS).toHaveLength(3);
+    expect(LEVELS[0]).toBe('低风险');
   });
 });
