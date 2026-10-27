@@ -2,6 +2,7 @@
 import '../core/app.js';
 import { $, icons } from '../core/dom.js';
 import { Api } from '../api/api.js';
+import { visibilityHintOf, humidityHintOf, rainHintOf } from '../domain/weather.view.js';
 
 function levelClass(i) {
   return ['lv-light', 'lv-mid', 'lv-heavy', 'lv-storm'][i] || 'lv-mid';
@@ -25,6 +26,9 @@ async function renderDashboard() {
   icons(heroIcon.parentNode);
 
   /* 未来 2 小时 */
+  const hint = rainHintOf(d.forecast2h);
+  $('#miniHint').className = 'tag tag-' + hint.tone;
+  $('#miniHintText').textContent = hint.text;
   const mini = $('#miniForecast');
   mini.innerHTML = d.forecast2h.map(function (f, i) {
     return (
@@ -69,9 +73,13 @@ async function renderDashboard() {
   $('#envWind').textContent = d.weather.windSpeed;
   $('#envWindHint').textContent = d.weather.wind;
   $('#envPressure').textContent = d.weather.pressure;
-  $('#envPressureTrend').textContent = (d.weather.pressureTrend > 0 ? '+' : '') + d.weather.pressureTrend;
+  const trend = $('#envPressureTrend');
+  trend.textContent = (d.weather.pressureTrend > 0 ? '+' : '') + d.weather.pressureTrend;
+  trend.className = d.weather.pressureTrend < 0 ? 'down' : '';
   $('#envVisibility').textContent = d.weather.visibility;
+  $('#envVisibilityHint').textContent = visibilityHintOf(d.weather.visibility);
   $('#envHumidity').textContent = d.weather.humidity;
+  $('#envHumidityHint').textContent = humidityHintOf(d.weather.humidity);
 
   /* 功能入口 */
   const grid = $('#featureGrid');

@@ -21,7 +21,7 @@
         <div class="ph-main">
           <span class="eyebrow">01 / 实时监测</span>
           <h1 class="page-title">气象看板</h1>
-          <p class="page-sub">G60 沪昆高速 嘉兴段 · 多传感器融合 · 更新于 <span class="mono" id="updatedAt">14:32:08</span></p>
+          <p class="page-sub">深圳 · 坪山 比亚迪总部 · 多传感器融合 · 更新于 <span class="mono" id="updatedAt">14:32:08</span></p>
         </div>
         <div class="head-meta">
           <div class="head-stat">
@@ -40,7 +40,7 @@
           <div class="hero-glow" aria-hidden="true"></div>
           <div class="hero-rings" aria-hidden="true"></div>
           <div class="hero-top">
-            <span class="tag tag-info"><span data-icon="map-pin"></span><span id="heroLocation">嘉兴 · 南湖区</span></span>
+            <span class="tag tag-info"><span data-icon="map-pin"></span><span id="heroLocation">深圳 · 坪山</span></span>
             <span class="hero-update">实况 · <span class="mono" id="heroUpdated">14:32</span></span>
           </div>
           <div class="hero-main">
@@ -58,7 +58,7 @@
           <div class="hero-mini">
             <div class="mini-head">
               <span class="mini-title">未来 2 小时</span>
-              <span class="tag tag-warn"><span data-icon="zap"></span>15:40 雷雨临近</span>
+              <span class="tag tag-ok" id="miniHint"><span data-icon="zap"></span><span id="miniHintText">未来 2 小时降水监测</span></span>
             </div>
             <div class="mini-list" id="miniForecast"></div>
           </div>
@@ -106,13 +106,13 @@
               <div class="et-head"><span class="et-ic" data-icon="eye"></span><span>能见度</span></div>
               <div class="et-val"><b class="mono" id="envVisibility">6.2</b><span>km</span></div>
               <div class="et-meter"><i style="width:52%"></i></div>
-              <div class="et-hint">一般 · 注意车距</div>
+              <div class="et-hint" id="envVisibilityHint">一般 · 注意车距</div>
             </div>
             <div class="env-tile">
               <div class="et-head"><span class="et-ic" data-icon="droplets"></span><span>湿度</span></div>
               <div class="et-val"><b class="mono" id="envHumidity">78</b><span>%</span></div>
               <div class="et-meter"><i style="width:78%" class="is-aqua"></i></div>
-              <div class="et-hint">偏高 · 车窗易起雾</div>
+              <div class="et-hint" id="envHumidityHint">偏高 · 车窗易起雾</div>
             </div>
           </div>
         </article>

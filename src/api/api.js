@@ -4,12 +4,24 @@
  TODO: replace adapters with real data sources.
 */
 import { DB } from '../data/mock.js';
+import { SITE } from '../config/site.js';
 import { Sensor } from '../adapters/sensor.js';
 import { Weather } from '../adapters/weather.js';
 import { Amap } from '../adapters/amap.js';
 import { rainLevelOf } from '../domain/rain.js';
 import { rainAssistPlan } from '../domain/rainstorm.rules.js';
 import { fishingScore } from '../domain/fishing.rules.js';
+import {
+  windTextOf,
+  skyOf,
+  rainChanceOf,
+  feelsOf,
+  visibilityOf,
+  pressureTrendOf
+} from '../domain/weather.view.js';
+
+/* 逐时预报取 0 / 30 / 60 / 90 分钟四个时刻 */
+const HOURLY_OFFSETS = [0, 30, 60, 90];
 
 /* 首页功能卡上的评级短文案 */
 const FISHING_RATING_SHORT = {
@@ -44,13 +56,68 @@ function featuresWithLiveMetric() {
   });
 }
 
+/* 在 15 分钟序列中取距目标时刻最近的一点 */
+function pointAt(series, targetAt) {
+  let nearest = series[0];
+  for (let i = 1; i < series.length; i += 1) {
+    if (Math.abs(series[i].at - targetAt) < Math.abs(nearest.at - targetAt)) nearest = series[i];
+  }
+  return nearest;
+}
+
+/* 实况点 → 看板天气对象（展示口径换算见 domain/weather.view.js） */
+function describeWeather(series, site) {
+  const now = series[0];
+  const dayLater = pointAt(series, now.at + 24 * 60 * 60 * 1000);
+  const sky = skyOf(now.rainRate, now.humidity);
+  return {
+    location: site.name,
+    temp: Math.round(now.temp),
+    feels: feelsOf(now.temp, now.humidity, now.windSpeed),
+    condition: sky.condition,
+    icon: sky.icon,
+    rainChance: rainChanceOf(now.rainRate),
+    humidity: Math.round(now.humidity),
+    visibility: visibilityOf(now.humidity, now.rainRate),
+    wind: windTextOf(now.windDeg, now.windSpeed),
+    windSpeed: Math.round(now.windSpeed * 3.6),
+    pressure: Math.round(now.pressure),
+    pressureTrend: pressureTrendOf(now.pressure, dayLater.pressure),
+    updatedAt: String(now.time).slice(11, 16)
+  };
+}
+
+function describeHourly(series) {
+  return HOURLY_OFFSETS.map(function (offset) {
+    const point = pointAt(series, series[0].at + offset * 60 * 1000);
+    const sky = skyOf(point.rainRate, point.humidity);
+    return {
+      time: String(point.time).slice(11, 16),
+      label: offset === 0 ? '现在' : offset + ' 分钟后',
+      temp: Math.round(point.temp),
+      icon: sky.icon,
+      rain: rainChanceOf(point.rainRate),
+      wind: Math.round(point.windSpeed * 3.6)
+    };
+  });
+}
+
 /* GET /api/dashboard  →  { vehicle, weather, rain, forecast2h, features } */
 async function getDashboard() {
   await delay(240);
   const rain = await Sensor.readVehicleRain();
   const level = rainLevelOf(rain.rate, rain.thresholds);
-  const weather = await Weather.readCurrent();
-  const forecast2h = await Weather.readHourly();
+  let weather;
+  let forecast2h;
+  try {
+    const series = await Weather.readSeries(SITE);
+    weather = describeWeather(series, SITE);
+    forecast2h = describeHourly(series);
+  } catch (error) {
+    /* 接口不可用（断网 / 订阅异常）时退回本地 mock，保证看板可用 */
+    weather = DB.weather;
+    forecast2h = DB.forecast2h;
+  }
   return {
     code: 0,
     data: {

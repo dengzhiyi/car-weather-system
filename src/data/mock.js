@@ -22,7 +22,7 @@ const DB = {
     sensorsTotal: 4
   },
   weather: {
-    location: '嘉兴 · 南湖区',
+    location: '深圳 · 坪山',
     temp: 24,
     feels: 26,
     high: 29,
