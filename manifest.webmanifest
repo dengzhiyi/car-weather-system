@@ -1,0 +1,27 @@
+{
+  "name": "车象 WeatherOS",
+  "short_name": "车象气象",
+  "description": "车载气象监测系统：实时看板、暴雨辅助、露营助手、山洪预警、钓鱼窗口",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#060B10",
+  "theme_color": "#060B10",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

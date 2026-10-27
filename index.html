@@ -4,10 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>气象看板 · 车象 WeatherOS</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="pages.css">
+  <meta name="theme-color" content="#060B10">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
 </head>
 <body data-page="home">
+  <noscript><div class="noscript-tip">本应用需要启用 JavaScript 才能运行，请检查浏览器设置。</div></noscript>
   <aside class="rail">
     <a class="brand" href="index.html" aria-label="车象 WeatherOS 首页">
       <span class="logo-glyph" data-icon="cloud-lightning"></span><sup>°</sup>
@@ -160,10 +167,10 @@
     </main>
   </div>
 
-  <script src="icons.js"></script>
-  <script src="mock.js"></script>
-  <script src="api.js"></script>
-  <script src="app.js"></script>
-  <script src="pages/home.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/data/mock.js"></script>
+  <script src="assets/api/api.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="pages/index.js"></script>
 </body>
 </html>

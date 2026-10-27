@@ -1,0 +1,31 @@
+/* ============================================================
+   01 · 设计令牌（Design Tokens）
+   只放变量，不放任何选择器。所有页面共用，禁止在页面内覆盖。
+   ============================================================ */
+:root {
+  --bg: #060B10;
+  --bg-2: #0A1219;
+  --surface: rgba(17, 28, 39, 0.78);
+  --surface-2: #131F2B;
+  --border: rgba(148, 180, 204, 0.13);
+  --border-strong: rgba(148, 180, 204, 0.26);
+  --text: #EDF4F9;
+  --text-sub: #93A7B8;
+  --text-dim: #63798B;
+  --primary: #59B7FF;
+  --primary-hover: #86CEFF;
+  --primary-deep: #1D6C9F;
+  --aqua: #2FD9C0;
+  --amber: #FFB35C;
+  --ok: #45D68A;
+  --danger: #FF5F5F;
+  --display: "Bahnschrift","DIN Alternate","HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --body: "PingFang SC","HarmonyOS Sans SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
+  --mono: "JetBrains Mono","SFMono-Regular","Cascadia Mono","Roboto Mono",ui-monospace,monospace;
+  --rail-w: 92px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-card: 0 1px 0 rgba(255,255,255,.04) inset, 0 18px 40px -26px rgba(0,0,0,.85);
+  --ease: cubic-bezier(.22,.61,.36,1);
+}
