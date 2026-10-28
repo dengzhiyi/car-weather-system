@@ -1,6 +1,7 @@
 /* ============================================================
    02 · 基础层（Reset / 排版 / 氛围 / 工具类）
    依赖 tokens.css，不依赖任何组件。
+   全屏实景壁纸由 shell 的 .wallpaper 承担，body 只保留深色兜底。
    ============================================================ */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
@@ -8,30 +9,12 @@ html, body { height: 100%; }
 html { font-size: calc(16px * var(--ui-scale)); }
 body {
   font-family: var(--body);
-  background:
-    radial-gradient(1100px 520px at 88% -12%, rgba(89,183,255,.10), transparent 60%),
-    radial-gradient(900px 600px at -10% 40%, rgba(47,217,192,.06), transparent 55%),
-    var(--bg);
+  background: var(--bg);
   color: var(--text);
   font-size: var(--fs-base);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
-}
-/* 工程网格 + 噪点氛围，非纯色平铺 */
-body::before {
-  content: "";
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background-image:
-    linear-gradient(rgba(148,180,204,.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148,180,204,.035) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: radial-gradient(1200px 800px at 50% 0%, #000 40%, transparent 100%);
-}
-body::after {
-  content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .5;
-  background-image: radial-gradient(rgba(255,255,255,.9) .6px, transparent .7px);
-  background-size: 240px 240px; mix-blend-mode: overlay;
+  overflow: hidden;
 }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
@@ -44,7 +27,7 @@ input, select { font-family: inherit; }
 }
 [data-icon] svg * { stroke-linecap: round; stroke-linejoin: round; }
 ::-webkit-scrollbar { width: 9px; height: 9px; }
-::-webkit-scrollbar-thumb { background: #1f3346; border-radius: 9px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,.18); border-radius: 9px; }
 ::-webkit-scrollbar-track { background: transparent; }
 
 /* ---------- 载入动画 ---------- */
@@ -72,6 +55,6 @@ input, select { font-family: inherit; }
 /* ---------- 无脚本降级 ---------- */
 .noscript-tip {
   position: fixed; inset: auto 0 0 0; z-index: 999;
-  padding: 14px 20px; background: #1a1116; color: #FFB35C;
+  padding: 14px 20px; background: #1a1116; color: #FFC670;
   border-top: 1px solid rgba(255,95,95,.45); font-size: 13px; text-align: center;
 }

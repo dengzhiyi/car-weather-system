@@ -112,6 +112,8 @@ async function render(mode) {
   floodPill.classList.toggle('is-ok', !s.alert);
   floodPillText.textContent = s.level;
   alertBanner.hidden = !s.alert;
+  /* 横幅出现时收紧下方卡片，保证 1600×960 一屏仍不溢出 */
+  document.body.classList.toggle('is-alert', !!s.alert);
 }
 
 /* ---------- 演示 seg 切换 ---------- */

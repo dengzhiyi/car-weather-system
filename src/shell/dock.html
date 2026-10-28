@@ -1,8 +1,10 @@
-<aside class="rail">
-    <a class="brand" href="./index.html" aria-label="气象环境助手 首页">
-      <span class="logo-glyph" data-icon="cloud-lightning"></span>
-    </a>
-    <nav class="rail-nav" aria-label="主导航">
+<footer class="dock">
+    <div class="dock-group">
+      <button class="d-ic back" type="button" data-dock="back" aria-label="返回"><span data-icon="chevron-right"></span></button>
+      <a class="d-ic" href="./index.html" aria-label="主页"><span data-icon="layout-dashboard"></span></a>
+    </div>
+    <div class="dock-sep"></div>
+    <nav class="dock-nav" aria-label="主导航">
       <a class="nav-item" data-nav="home" href="./index.html" title="气象看板">
         <span class="ni-icon" data-icon="layout-dashboard"></span><span class="ni-label">气象</span>
       </a>
@@ -19,7 +21,10 @@
         <span class="ni-icon" data-icon="fish"></span><span class="ni-label">钓鱼</span>
       </a>
     </nav>
-    <div class="rail-foot">
-      <span class="sys"><span class="sys-dot"></span>系统正常</span>
+    <div class="dock-sep"></div>
+    <div class="dock-right">
+      <span class="temp-pill"><b>24</b>°C</span>
+      <button class="d-ic" type="button" data-dock="refresh" aria-label="刷新数据"><span data-icon="refresh-cw"></span></button>
+      <button class="d-ic" type="button" data-dock="settings" aria-label="设置"><span data-icon="sliders-horizontal"></span></button>
     </div>
-  </aside>
+  </footer>

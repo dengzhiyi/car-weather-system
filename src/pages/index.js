@@ -24,14 +24,15 @@ async function renderDashboard() {
   heroIcon.removeAttribute('data-icon-ready');
   icons(heroIcon.parentNode);
 
-  /* 未来 4 小时 */
-  const hint = rainHintOf(d.forecast4h);
+  /* 未来 5 小时（去掉「现在」这一档） */
+  const hours = d.forecast5h.slice(1);
+  const hint = rainHintOf(hours);
   $('#miniHint').className = 'tag tag-' + hint.tone;
   $('#miniHintText').textContent = hint.text;
   const mini = $('#miniForecast');
-  mini.innerHTML = d.forecast4h.map(function (f, i) {
+  mini.innerHTML = hours.map(function (f) {
     return (
-      '<div class="mini-item' + (i === 0 ? ' is-now' : '') + '">' +
+      '<div class="mini-item">' +
         '<span class="mi-time">' + f.time + '</span>' +
         '<span class="mi-ic" data-icon="' + f.icon + '"></span>' +
         '<span class="mi-temp">' + f.temp + '°</span>' +

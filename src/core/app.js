@@ -53,6 +53,20 @@ function tick() {
 tick();
 setInterval(tick, 1000);
 
+/* ---------- 底部 Dock 全局操作 ---------- */
+const dockBack = $('[data-dock="back"]');
+if (dockBack) {
+  dockBack.addEventListener('click', function () { history.back(); });
+}
+const dockRefresh = $('[data-dock="refresh"]');
+if (dockRefresh) {
+  dockRefresh.addEventListener('click', function () { location.reload(); });
+}
+const dockSettings = $('[data-dock="settings"]');
+if (dockSettings) {
+  dockSettings.addEventListener('click', function () { toast('设置面板将在后续版本开放', 'info'); });
+}
+
 /* ---------- 通用开关（通知类），页面级开关各自接管 ---------- */
 $$('.js-switch').forEach(function (sw) {
   if (!sw.hasAttribute('role')) sw.setAttribute('role', 'switch');

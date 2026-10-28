@@ -61,12 +61,13 @@ const DB = {
     /* 近 60 分钟，每 5 分钟一个采样 */
     history60m: [0.4, 0.8, 1.2, 1.9, 2.6, 3.4, 4.1, 5.3, 6.4, 7.8, 9.6, 11.2, 12.6]
   },
-  forecast4h: [
+  forecast5h: [
     { time: '14:30', label: '现在', temp: 24, icon: 'cloud-sun', rain: 30, wind: 12 },
     { time: '15:30', label: '1 小时后', temp: 23, icon: 'cloud-rain', rain: 78, wind: 19 },
     { time: '16:30', label: '2 小时后', temp: 22, icon: 'cloud-lightning', rain: 90, wind: 26 },
     { time: '17:30', label: '3 小时后', temp: 22, icon: 'cloud-drizzle', rain: 65, wind: 22 },
-    { time: '18:30', label: '4 小时后', temp: 21, icon: 'cloud', rain: 40, wind: 16 }
+    { time: '18:30', label: '4 小时后', temp: 21, icon: 'cloud', rain: 40, wind: 16 },
+    { time: '19:30', label: '5 小时后', temp: 20, icon: 'cloud', rain: 30, wind: 14 }
   ],
   features: [
     {

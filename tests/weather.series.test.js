@@ -84,13 +84,14 @@ describe('Api.getDashboard 天气映射', () => {
     expect(w.visibility).toBe(18.5);
     expect(w.updatedAt).toBe('21:00');
 
-    const hourly = res.data.forecast4h;
-    expect(hourly).toHaveLength(5);
+    const hourly = res.data.forecast5h;
+    expect(hourly).toHaveLength(6);
     expect(hourly[0].time).toBe('21:00');
     expect(hourly[1].time).toBe('22:00');
-    expect(hourly[4].time).toBe('01:00');
+    expect(hourly[5].time).toBe('02:00');
     expect(hourly[0].label).toBe('现在');
     expect(hourly[1].label).toBe('1 小时后');
+    expect(hourly[5].label).toBe('5 小时后');
     expect(hourly[0].temp).toBe(25);
     expect(hourly[4].temp).toBe(24);
   });
@@ -106,7 +107,7 @@ describe('Api.getDashboard 天气映射', () => {
     const w = res.data.weather;
     expect(w.location).toBe('深圳 · 坪山');
     expect(typeof w.temp).toBe('number');
-    expect(res.data.forecast4h).toHaveLength(5);
+    expect(res.data.forecast5h).toHaveLength(6);
     expect(res.data.features).toHaveLength(4);
   });
 });

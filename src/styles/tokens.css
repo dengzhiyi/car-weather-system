@@ -3,31 +3,56 @@
    只放变量，不放任何选择器。所有页面共用，禁止在页面内覆盖。
 
    屏幕适配：
-   基准为比亚迪车机 12.8″ / 1920×1080。12.8″ 与 15.6″ 分辨率相同，
-   浏览器无法区分物理尺寸，故按 12.8″ 定尺，字号统一走 rem 令牌，
-   切换屏幕时只需改 --ui-scale（15.6″ 建议 0.85，保持文字物理大小接近）。
+   目标车机 11.5″ / 2000×1200 / 200dpi。
+   200dpi ÷ 160 = 1.25（Android density），WebView 的 CSS 视口即
+   2000 ÷ 1.25 × 1200 ÷ 1.25 = 1600 × 960 CSS px，故全部按 1600×960 定尺。
+   字号统一走 rem 令牌，切换屏幕时改 --ui-scale 即可整屏缩放。
+
+   系统安全区：
+   车机为 Android 12，顶部状态栏与底部手势控制栏为悬浮覆盖，
+   会占用 WebView 顶部约 24dp（+呼吸位 6）、底部约 24dp。
+   CSS px 与 dp 等值，故以 --sys-top / --sys-bottom 预留；
+   支持安全区变量的 WebView 用 env() 兜底取较大值。
    ============================================================ */
 :root {
   /* ---------- 屏幕缩放 ---------- */
   --ui-scale: 1;
 
+  /* ---------- 屏幕基准与系统安全区 ---------- */
+  --screen-w: 1600px;
+  --screen-h: 960px;
+  --sys-top: 30px;
+  --sys-bottom: 24px;
+  --safe-top: max(var(--sys-top), env(safe-area-inset-top, 0px));
+  --safe-bottom: max(var(--sys-bottom), env(safe-area-inset-bottom, 0px));
+  --gutter: 44px;
+  --dock-h: 84px;
+
+  /* ---------- 玻璃材质（DiLink 5.0 胶囊） ---------- */
+  --glass: linear-gradient(158deg, rgba(255,255,255,.20) 0%, rgba(255,255,255,.09) 46%, rgba(255,255,255,.13) 100%);
+  --glass-line: rgba(255,255,255,.30);
+  --glass-shadow: 0 26px 54px -26px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.42), inset 0 -1px 0 rgba(255,255,255,.10);
+  --glass-scrim: linear-gradient(180deg, rgba(8,14,20,.30), rgba(8,14,20,.12));
+  --glass-blur: blur(26px) saturate(150%);
+  --radius-glass: 26px;
+
   /* ---------- 颜色 ---------- */
-  --bg: #060B10;
+  --bg: #05080B;
   --bg-2: #0A1219;
   --surface: rgba(17, 28, 39, 0.78);
   --surface-2: #131F2B;
-  --border: rgba(148, 180, 204, 0.13);
-  --border-strong: rgba(148, 180, 204, 0.26);
-  --text: #EDF4F9;
-  --text-sub: #A6B9C8;
-  --text-dim: #7B90A2;
-  --primary: #59B7FF;
-  --primary-hover: #86CEFF;
+  --border: rgba(255, 255, 255, 0.16);
+  --border-strong: rgba(255, 255, 255, 0.28);
+  --text: #FFFFFF;
+  --text-sub: rgba(255, 255, 255, 0.78);
+  --text-dim: rgba(255, 255, 255, 0.62);
+  --primary: #6BB8FF;
+  --primary-hover: #A6D6FF;
   --primary-deep: #1D6C9F;
-  --aqua: #2FD9C0;
-  --amber: #FFB35C;
-  --ok: #45D68A;
-  --danger: #FF5F5F;
+  --aqua: #6FE3C4;
+  --amber: #FFC670;
+  --ok: #6FE3C4;
+  --danger: #FF8A7A;
 
   /* ---------- 字体 ---------- */
   --display: "HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
@@ -47,11 +72,10 @@
   --fs-3xl: 2.125rem;   /* 34px */
 
   /* ---------- 尺寸 ---------- */
-  --rail-w: 108px;
   --tap-min: 44px;      /* 车机最小触控高度 */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  --shadow-card: 0 1px 0 rgba(255,255,255,.04) inset, 0 18px 40px -26px rgba(0,0,0,.85);
+  --shadow-card: 0 26px 54px -26px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.42);
   --ease: cubic-bezier(.22,.61,.36,1);
 }

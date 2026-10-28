@@ -146,7 +146,7 @@ describe('rainHintOf', () => {
     expect(rainHintOf([{ time: '21:00', rain: 10 }, { time: '21:30', rain: 55 }]))
       .toEqual({ text: '21:30 有阵雨可能', tone: 'info' });
     expect(rainHintOf([{ time: '21:00', rain: 10 }]))
-      .toEqual({ text: '4 小时内无明显降水', tone: 'ok' });
+      .toEqual({ text: '5 小时内无明显降水', tone: 'ok' });
   });
 
   it('空预报不报错', () => {

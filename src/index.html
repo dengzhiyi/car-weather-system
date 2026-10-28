@@ -4,120 +4,116 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>气象看板 · 气象环境助手</title>
-  <meta name="theme-color" content="#060B10">
+  <meta name="theme-color" content="#05080B">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./styles/main.css">
 </head>
 <body data-page="home">
   <noscript><div class="noscript-tip">本应用需要启用 JavaScript 才能运行，请检查浏览器设置。</div></noscript>
-  <!-- @include shell/rail.html -->
+  <!-- @include shell/backdrop.html -->
 
-  <div class="workspace">
-    <!-- @include shell/topbar.html -->
+  <div class="app">
+    <!-- @include shell/sysbar.html -->
 
-    <main class="content">
-      <section class="page-head stagger">
-        <div class="ph-main">
-          <div class="ph-title">
-            <h1 class="page-title">气象看板</h1>
-            <button class="help-btn" type="button" data-help="融合车载雨量传感器与实时天气接口，展示当前位置的实况、未来 4 小时降水与雨量等级，以及风速、气压、能见度、湿度等行车环境指标。" aria-label="查看功能说明" aria-expanded="false"><span data-icon="circle-help"></span></button>
-          </div>
+    <main class="content home">
+      <!-- 主视觉：超大温度 + 天气现象 -->
+      <section class="hero">
+        <div class="hero-temp"><span class="t-num" id="heroTemp">24</span><span class="t-deg">°C</span></div>
+        <div class="hero-cond">
+          <span id="heroCondition">多云转雷阵雨</span>
+          <button class="help-btn" type="button" data-help="融合车载雨量传感器与实时天气接口，展示当前位置的实况、未来 5 小时降水与雨量等级，以及风速、气压、能见度、湿度等行车环境指标。" aria-label="查看功能说明" aria-expanded="false"><span data-icon="circle-help"></span></button>
         </div>
-        <div class="head-actions">
-          <span class="status-pill is-ok"><span class="live-dot"></span>数据更新于 <b class="mono" id="updatedAt">14:32:08</b></span>
+        <div class="hero-loc"><span data-icon="map-pin"></span><span id="heroLocation">深圳 · 坪山</span></div>
+        <div class="hero-meta">
+          <span>体感 <b id="heroFeels">26°</b></span>
+          <span class="sep"></span>
+          <span>降水概率 <b class="warn" id="heroRainChance">78%</b></span>
+          <span class="sep"></span>
+          <span><span data-icon="sunrise"></span>06:12</span>
+          <span><span data-icon="sunset"></span>17:24</span>
+          <span class="sep"></span>
+          <span class="meta-live"><span class="live-dot"></span>更新 <b id="updatedAt">14:32:08</b></span>
         </div>
       </section>
+      <div class="hero-glyph" id="heroIcon" data-icon="cloud-lightning" aria-hidden="true"></div>
 
-      <div class="grid g-5-3-4 home-top stagger">
-        <article class="card hero-card">
-          <div class="hero-glow" aria-hidden="true"></div>
-          <div class="hero-rings" aria-hidden="true"></div>
-          <div class="hero-top">
-            <span class="tag tag-info"><span data-icon="map-pin"></span><span id="heroLocation">深圳 · 坪山</span></span>
-          </div>
-          <div class="hero-main">
-            <div class="hero-temp"><span class="num-xl" id="heroTemp">24</span><span class="hero-deg">°C</span></div>
-            <div class="hero-desc">
-              <div class="hero-cond" id="heroCondition">多云转雷阵雨</div>
-              <div class="hero-sub">体感 <span class="mono" id="heroFeels">26°</span> · 降水概率 <span class="hl mono" id="heroRainChance">78%</span></div>
-              <div class="hero-range">
-                <span data-icon="sunrise"></span><span class="mono">06:12</span>
-                <span data-icon="sunset"></span><span class="mono">17:24</span>
-              </div>
-            </div>
-            <div class="hero-weather-ic" id="heroIcon" data-icon="cloud-lightning"></div>
-          </div>
-          <div class="hero-mini">
-            <div class="mini-head">
-              <span class="mini-title">未来 4 小时</span>
-              <span class="tag tag-ok" id="miniHint"><span data-icon="zap"></span><span id="miniHintText">未来 4 小时降水监测</span></span>
-            </div>
-            <div class="mini-list" id="miniForecast"></div>
-          </div>
-        </article>
-
-        <article class="card rain-card">
-          <div class="card-head">
-            <span class="ch-ic" data-icon="droplets"></span>
+      <!-- 底部胶囊组 -->
+      <section class="pods">
+        <article class="pod pod-rain">
+          <div class="pod-head">
+            <span class="h-ic" data-icon="droplets"></span>
             <h3>雨量传感器</h3>
-            <span class="ch-tag tag tag-ok"><span class="live-dot"></span>在线</span>
+            <span class="h-tag"><span class="live-dot"></span>在线</span>
           </div>
-          <div class="rain-main">
-            <div class="rain-num"><span class="num-xl" id="rainRate">12.6</span><span class="rain-unit">mm/h</span></div>
+          <div class="rain-big">
+            <span class="r-num" id="rainRate">12.6</span>
+            <span class="r-unit">mm/h</span>
             <span class="level-pill lv-heavy" id="rainLevel">大雨</span>
           </div>
-          <div class="rain-scale" id="rainScale" aria-label="雨量等级刻度"></div>
-          <div class="rain-readouts">
-            <div><span>近 10 分钟</span><b class="mono" id="rainDelta">+3.2 mm</b></div>
-            <div><span>累计雨量</span><b class="mono" id="rainTotal">18.4 mm</b></div>
-          </div>
           <div class="bars" id="rainBars" aria-hidden="true"></div>
-          <div class="bars-axis"><span>60 min</span><span>30 min</span><span>现在</span></div>
+          <div class="rain-scale" id="rainScale" aria-label="雨量等级刻度"></div>
+          <div class="rain-foot">
+            <span>近 10 分钟<b id="rainDelta">+3.2 mm</b></span>
+            <span>累计雨量<b id="rainTotal">18.4 mm</b></span>
+          </div>
         </article>
 
-        <article class="card env-card">
-          <div class="card-head">
-            <span class="ch-ic" data-icon="compass"></span>
+        <article class="pod pod-fc">
+          <div class="pod-head">
+            <span class="h-ic" data-icon="cloud-rain"></span>
+            <h3>未来 5 小时</h3>
+            <span class="h-tag tag tag-ok" id="miniHint"><span class="live-dot"></span><span id="miniHintText">降水峰值 16:30 · 90%</span></span>
+          </div>
+          <div class="mini-list" id="miniForecast"></div>
+        </article>
+
+        <article class="pod pod-env">
+          <div class="pod-head">
+            <span class="h-ic" data-icon="compass"></span>
             <h3>行车环境</h3>
-            <span class="ch-tag tag tag-dim">实时</span>
+            <span class="h-tail">实时</span>
           </div>
           <div class="env-grid">
             <div class="env-tile">
               <div class="et-head"><span class="et-ic" data-icon="wind"></span><span>风速</span></div>
-              <div class="et-val"><b class="mono" id="envWind">12</b><span>km/h</span></div>
+              <div class="et-val"><b id="envWind">12</b><span>km/h</span></div>
               <div class="et-meter"><i style="width:38%"></i></div>
               <div class="et-hint" id="envWindHint">东南风 · 3 级</div>
             </div>
             <div class="env-tile">
               <div class="et-head"><span class="et-ic" data-icon="gauge"></span><span>气压</span></div>
-              <div class="et-val"><b class="mono" id="envPressure">1008</b><span>hPa</span></div>
+              <div class="et-val"><b id="envPressure">1008</b><span>hPa</span></div>
               <div class="et-meter"><i style="width:62%" class="is-amber"></i></div>
               <div class="et-hint">24h <span class="down" id="envPressureTrend">-1.8</span> hPa</div>
             </div>
             <div class="env-tile">
               <div class="et-head"><span class="et-ic" data-icon="eye"></span><span>能见度</span></div>
-              <div class="et-val"><b class="mono" id="envVisibility">6.2</b><span>km</span></div>
+              <div class="et-val"><b id="envVisibility">6.2</b><span>km</span></div>
               <div class="et-meter"><i style="width:52%"></i></div>
               <div class="et-hint" id="envVisibilityHint">一般 · 注意车距</div>
             </div>
             <div class="env-tile">
               <div class="et-head"><span class="et-ic" data-icon="droplets"></span><span>湿度</span></div>
-              <div class="et-val"><b class="mono" id="envHumidity">78</b><span>%</span></div>
+              <div class="et-val"><b id="envHumidity">78</b><span>%</span></div>
               <div class="et-meter"><i style="width:78%" class="is-aqua"></i></div>
               <div class="et-hint" id="envHumidityHint">偏高 · 车窗易起雾</div>
             </div>
           </div>
         </article>
-      </div>
 
-      <section class="feature-strip stagger">
-        <div class="strip-head">
-          <h2 class="strip-title">功能入口</h2>
-        </div>
-        <div class="feature-grid" id="featureGrid"></div>
+        <article class="pod pod-entry">
+          <div class="pod-head">
+            <span class="h-ic" data-icon="sliders-horizontal"></span>
+            <h3>快捷入口</h3>
+            <span class="h-tail">4 项功能</span>
+          </div>
+          <div class="entry-list" id="featureGrid"></div>
+        </article>
       </section>
     </main>
+
+    <!-- @include shell/dock.html -->
   </div>
 
   <script type="module" src="./pages/index.js"></script>

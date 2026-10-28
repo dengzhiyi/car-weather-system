@@ -23,9 +23,9 @@ const results = [];
 const add = (name, fails) => results.push({ name, fails });
 
 const shellOf = (html) => {
-  const rail = html.match(/<aside class="rail">[\s\S]*?<\/aside>/);
-  const top = html.match(/<header class="topbar">[\s\S]*?<\/header>/);
-  return rail && top ? rail[0] + top[0] : null;
+  const bar = html.match(/<header class="sysbar">[\s\S]*?<\/header>/);
+  const dock = html.match(/<footer class="dock">[\s\S]*?<\/footer>/);
+  return bar && dock ? bar[0] + dock[0] : null;
 };
 
 if (!has('index.html')) {
@@ -37,7 +37,7 @@ add('产物页面齐全', () => PAGES.filter((p) => !has(p.file)).map((p) => `�
 
 add('Shell 一致性', () => {
   const base = shellOf(read(PAGES[0].file));
-  if (!base) return ['index.html 缺少 rail / topbar'];
+  if (!base) return ['index.html 缺少 sysbar / dock'];
   if (/@include/.test(base)) return ['Shell 片段未被注入（残留 @include）'];
   return PAGES.slice(1).filter((p) => shellOf(read(p.file)) !== base).map((p) => `${p.file} Shell 不一致`);
 });

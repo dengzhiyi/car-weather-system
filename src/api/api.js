@@ -20,8 +20,8 @@ import {
   pressureTrendOf
 } from '../domain/weather.view.js';
 
-/* 逐时预报取当前 + 未来 4 小时，每小时一列 */
-const HOURLY_OFFSETS = [0, 60, 120, 180, 240];
+/* 逐时预报取当前 + 未来 5 小时，每小时一列（首页去掉当前档展示 5 档） */
+const HOURLY_OFFSETS = [0, 60, 120, 180, 240, 300];
 
 /* 首页功能卡上的评级短文案 */
 const FISHING_RATING_SHORT = {
@@ -102,21 +102,21 @@ function describeHourly(series) {
   });
 }
 
-/* GET /api/dashboard  →  { vehicle, weather, rain, forecast4h, features } */
+/* GET /api/dashboard  →  { vehicle, weather, rain, forecast5h, features } */
 async function getDashboard() {
   await delay(240);
   const rain = await Sensor.readVehicleRain();
   const level = rainLevelOf(rain.rate, rain.thresholds);
   let weather;
-  let forecast4h;
+  let forecast5h;
   try {
     const series = await Weather.readSeries(SITE);
     weather = describeWeather(series, SITE);
-    forecast4h = describeHourly(series);
+    forecast5h = describeHourly(series);
   } catch (error) {
     /* 接口不可用（断网 / 订阅异常）时退回本地 mock，保证看板可用 */
     weather = DB.weather;
-    forecast4h = DB.forecast4h;
+    forecast5h = DB.forecast5h;
   }
   return {
     code: 0,
@@ -124,7 +124,7 @@ async function getDashboard() {
       vehicle: DB.vehicle,
       weather: weather,
       rain: Object.assign({}, rain, { level: level.name, levelIndex: level.index }),
-      forecast4h: forecast4h,
+      forecast5h: forecast5h,
       features: featuresWithLiveMetric()
     }
   };
