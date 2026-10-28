@@ -20,7 +20,9 @@ if (helpBtn) {
   pop.textContent = helpBtn.getAttribute('data-help') || '';
   pop.hidden = true;
   helpBtn.parentNode.appendChild(pop);
+  let helpTimer = 0;
   const closeHelp = function () {
+    clearTimeout(helpTimer);
     pop.hidden = true;
     helpBtn.setAttribute('aria-expanded', 'false');
   };
@@ -29,6 +31,9 @@ if (helpBtn) {
     const willOpen = pop.hidden;
     pop.hidden = !willOpen;
     helpBtn.setAttribute('aria-expanded', String(willOpen));
+    clearTimeout(helpTimer);
+    /* 点开后 5 秒自动收起，避免长时间遮挡页面内容 */
+    if (willOpen) helpTimer = setTimeout(closeHelp, 5000);
   });
   document.addEventListener('click', function (e) {
     if (!pop.hidden && !pop.contains(e.target)) closeHelp();

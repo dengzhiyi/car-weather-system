@@ -3,11 +3,11 @@ import { Weather } from '../src/adapters/weather.js';
 import { Api } from '../src/api/api.js';
 import { SITE } from '../src/config/site.js';
 
-/* 真实接口返回的 15 分钟序列（取 17 个点覆盖 4 小时，字段与单位同线上一致：psz 为 Pa、ws10m 为 m/s） */
+/* 真实接口返回的 15 分钟序列（取 21 个点覆盖 5 小时，字段与单位同线上一致：psz 为 Pa、ws10m 为 m/s） */
 function fixture() {
   const base = Date.parse('2026-10-26T21:00+08:00');
   const data = [];
-  for (let i = 0; i < 17; i += 1) {
+  for (let i = 0; i < 21; i += 1) {
     const at = base + i * 15 * 60 * 1000;
     /* 本地 +08:00 墙钟时间，保持与线上返回字段一致 */
     const local = new Date(at + 8 * 60 * 60 * 1000).toISOString().slice(0, 16) + '+08:00';
@@ -38,7 +38,7 @@ describe('Weather.readSeries', () => {
       return { ok: true, json: async function () { return fixture(); } };
     });
     const series = await Weather.readSeries(SITE);
-    expect(series).toHaveLength(17);
+    expect(series).toHaveLength(21);
     const first = series[0];
     expect(first.at).toBe(Date.parse('2026-10-26T21:00+08:00'));
     expect(first.temp).toBeCloseTo(24.53, 2);

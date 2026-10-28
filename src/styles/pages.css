@@ -105,13 +105,19 @@
 .hero-glyph svg { width: 100%; height: 100%; stroke-width: 1.1; }
 
 /* ---------- Home · 底部胶囊组 ---------- */
-/* 四个胶囊均为固定宽度，总宽超出内容区时整行左右滑动（不压缩内部排版） */
+/* 四个胶囊均为固定宽度，总宽超出内容区时整行左右滑动（不压缩内部排版）。
+   负外边距做成「全出血」：滑动视口与裁切边缘贴屏幕左右边；
+   左右各留 44px 内边距 —— 滑到起点时首胶囊与 Dock 左端对齐，
+   滑到底时末胶囊与 Dock 右端对齐，与其他内容的栏距保持一致。 */
 .pods {
   margin-top: auto; position: relative; z-index: 3;
+  margin-inline: calc(var(--gutter) * -1);
+  padding-inline: var(--gutter);
   display: flex; gap: 14px; height: 250px; align-items: stretch;
   overflow-x: auto; overflow-y: hidden;
   overscroll-behavior-x: contain;
   scroll-snap-type: x proximity;
+  scroll-padding-inline: var(--gutter);
   scrollbar-width: none;
 }
 .pods::-webkit-scrollbar { display: none; }
@@ -182,8 +188,9 @@
 .rain-foot b { display: block; margin-top: 2px; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
 
 /* 2 · 未来 5 小时 */
-/* 胶囊固定宽度：5 档各 78.8px 完整呈现，不再随窗口压缩 */
-.pod-fc { width: 430px; flex: none; }
+/* 胶囊固定宽度：5 档各约 86.8px 完整呈现，不随窗口压缩。
+   470px 使四胶囊总宽（1590）+ 左侧栏距 44 超过 1600 屏宽，保证车机上也能滑动 */
+.pod-fc { width: 470px; flex: none; }
 /* 宽度够时 5 档均分铺满；不够时每档保持 68px 下限并横向滑动，避免文字被挤重叠 */
 .mini-list {
   flex: 1; min-height: 0; min-width: 0; padding-top: 4px;
@@ -730,6 +737,6 @@
   .monitor-grid { grid-template-columns: 1fr; }
   .arrival-grid { grid-template-columns: 1fr 1fr; }
   .rs-grid, .fish-grid { grid-template-columns: 1fr; }
-  .d-ic, .temp-pill, .sys-status, .sys-loc, .sys-radio { display: none; }
+  .d-ic, .temp-pill, .sys-loc, .sys-radio { display: none; }
   .dock-nav { justify-content: flex-start; overflow-x: auto; }
 }
