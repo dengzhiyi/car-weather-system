@@ -30,11 +30,12 @@
 │  ├─ config/  site.js                         # 默认监测点（经纬度）
 │  ├─ domain/  rain.js  rainstorm.rules.js  flood.rules.js  fishing.rules.js  weather.view.js
 │  ├─ adapters/ sensor.js  weather.js  amap.js  # 外部数据源隔离层
+│  ├─ maps/    amap.js  geo.js                 # 高德 JS API 挂载 / WGS-84→GCJ-02
 │  ├─ api/     api.js                          # 接口 stub（签名即未来真实接口）
 │  ├─ data/    mock.js                         # 单一 mock 数据源（只存原始读数）
 │  ├─ pages/   index.js  rainstorm.js  camping.js  flood.js  fishing.js
 │  ├─ styles/  tokens.css → base.css → components.css → pages.css / main.css
-│  └─ public/  icon.svg  manifest.webmanifest
+│  └─ public/  icon.svg  manifest.webmanifest  map/*.jpg  # 离线真实地图快照
 ├─ tests/      rainstorm / flood / fishing / weather.view / weather.series
 ├─ scripts/    check-dist.mjs                  # 构建产物自检
 ├─ dist/                                       # 构建产物（git 忽略）
@@ -92,10 +93,32 @@ npm test          # 运行 domain 规则单测
 
 > 订阅 key 目前写在适配层内，仅用于原型。正式部署时应由后端代理转发并保管密钥。
 
+## 高德地图（可选）
+
+露营页「路线预览」分三层，按可用性自动接管：
+
+1. **在线高德**（配置 Key 且联网）：实时瓦片 + 路况图层 + 起终点与路线
+2. **离线真实地图**（无网 / CDN 不可达）：`src/public/map/<目的地>.jpg` 真实地图快照，随目的地切换
+3. **SVG 示意地图**（快照缺失）：纯内嵌矢量兜底
+
+```bash
+cp .env.example src/.env.local   # 本工程 vite root 为 src，env 文件必须放在 src/ 下
+# 填入 VITE_AMAP_KEY / VITE_AMAP_SECURITY_CODE
+npm run dev
+```
+
+- 无 Key、断网或 5 秒内加载失败时自动回退，不报错、不影响一屏排版
+- 使用 JS API **1.4.17**（2.0 会创建 `javascript:` iframe 触发 CSP 拦截）；两版内部都用 `new Function`，因此构建产物 CSP 放行 `'unsafe-eval'`（源码本身仍无 `eval`）
+- 路线规划 `AMap.Driving` 走 restapi，**必须配「安全密钥」**（`VITE_AMAP_SECURITY_CODE`）；未配置时自动降级为起终点标记 + 虚线估算，真实地图与路况照常显示
+- mock 坐标为 WGS-84，上图前由 [geo.js](file:///workspace/car-weather-system/src/maps/geo.js) 转 GCJ-02
+- 离线快照由在线地图截取（`src/public/map/`），改主题或换目的地后重新截图即可
+
+CSP 已放行 `webapi.amap.com`、`*.amap.com`、`*.autonavi.com`。
+
 ## 校验
 
 ```bash
-npm test             # domain 纯规则单测（54 例）
+npm test             # domain 纯规则单测（57 例）
 npm run check:dist   # 需先 npm run build
 ```
 

@@ -109,11 +109,14 @@ const DB = {
     current: {
       name: '当前位置', coord: '22.6808° N, 114.3558° E'
     },
+    /* 起点：比亚迪总部（坪山），WGS-84，上图前转 GCJ-02 */
+    origin: { name: '比亚迪总部', lat: 22.6808, lng: 114.3558 },
     destinations: [
       {
         id: 'xichong',
         name: '大鹏半岛西涌营地',
         region: '深圳 · 大鹏新区',
+        lat: 22.4697, lng: 114.5733,
         distance: '58 km',
         duration: '1 小时 05 分',
         arrival: '16:15',
@@ -141,6 +144,7 @@ const DB = {
         id: 'malun',
         name: '马峦山溪谷营地',
         region: '深圳 · 坪山区',
+        lat: 22.6322, lng: 114.3385,
         distance: '18 km',
         duration: '32 分',
         arrival: '15:42',
@@ -168,6 +172,7 @@ const DB = {
         id: 'xianhu',
         name: '梧桐山仙湖营地',
         region: '深圳 · 罗湖区',
+        lat: 22.5673, lng: 114.1735,
         distance: '26 km',
         duration: '44 分',
         arrival: '15:54',

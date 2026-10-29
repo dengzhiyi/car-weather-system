@@ -42,9 +42,14 @@ function productionCsp(): Plugin {
     apply: 'build',
     transformIndexHtml(html: string) {
       const meta =
-        `  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; ` +
-        `style-src 'self' 'unsafe-inline'; script-src 'self'; ` +
-        `connect-src 'self' https://api.tjweather.com; base-uri 'none'; form-action 'none'">`;
+        `  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; ` +
+        `img-src 'self' data: blob: https://*.amap.com https://*.autonavi.com; ` +
+        `style-src 'self' 'unsafe-inline' https://*.amap.com; ` +
+        /* 高德 JS API 内部使用 new Function，必须放行 'unsafe-eval'（仅构建产物，源码仍禁止 eval） */
+        `script-src 'self' 'unsafe-eval' https://*.amap.com https://*.autonavi.com; ` +
+        `font-src 'self' data: https://*.amap.com; ` +
+        `connect-src 'self' https://api.tjweather.com https://*.amap.com https://*.autonavi.com; ` +
+        `worker-src blob:; base-uri 'none'; form-action 'none'">`;
       return html.replace('</head>', `${meta}\n</head>`);
     },
   };

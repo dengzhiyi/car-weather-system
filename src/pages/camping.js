@@ -3,11 +3,13 @@ import '../core/app.js';
 import { $, $$, toast, icons } from '../core/dom.js';
 import { DB } from '../data/mock.js';
 import { Api } from '../api/api.js';
+import { mountRouteMap } from '../maps/amap.js';
 
 const list = DB.camping.destinations;
 let current = list[0];
 let busy = false;
 let mapScale = 1;
+let routeMap = null;
 
 const input = $('#destInput');
 const searchBox = $('#searchBox');
@@ -77,6 +79,8 @@ function renderDestination(dest, route) {
   }).join('');
 
   markChips(dest.id);
+  if (routeMap) routeMap.setDestination(dest);
+  else showShot(dest);
   icons(document);
 }
 
@@ -131,14 +135,71 @@ chips.addEventListener('click', function (e) {
   }
 });
 
-/* ---------- 地图缩放 ---------- */
+/* ---------- 地图图层：在线高德 > 离线真实地图快照 > SVG 示意 ---------- */
+const mapCanvas = $('.map-canvas');
 const mapArt = $('#mapArt');
+const mapShot = $('#mapShot');
+const providerEl = $('.map-provider');
+let shotId = '';
+
+function setProvider(text, offline) {
+  $('#mapProviderText').textContent = text;
+  providerEl.classList.toggle('is-offline', Boolean(offline));
+}
+
+function clearShot() {
+  shotId = '';
+  if (!mapShot) return;
+  mapShot.hidden = true;
+  mapShot.removeAttribute('src');
+  mapCanvas.classList.remove('is-shot');
+}
+
+/* 离线默认展示真实地图快照，快照缺失才退回 SVG 示意地图 */
+function showShot(dest) {
+  if (!mapShot || !dest) return;
+  if (shotId === dest.id && !mapShot.hidden) return;
+  shotId = dest.id;
+  mapShot.alt = dest.name + ' · 离线地图';
+  mapShot.onload = function () {
+    if (routeMap) { clearShot(); return; }
+    mapShot.hidden = false;
+    mapCanvas.classList.add('is-shot');
+    setProvider('离线地图 · 快照', false);
+  };
+  mapShot.onerror = function () {
+    clearShot();
+    setProvider('示意图 · 离线', true);
+  };
+  mapShot.src = 'map/' + dest.id + '.jpg';
+}
+
 function zoom(delta) {
+  if (routeMap) {
+    routeMap.zoomBy(delta > 0 ? 1 : -1);
+    return;
+  }
   mapScale = Math.min(1.5, Math.max(1, mapScale + delta));
-  mapArt.style.transform = 'scale(' + mapScale.toFixed(2) + ')';
+  const layer = mapCanvas.classList.contains('is-shot') ? mapShot : mapArt;
+  layer.style.transform = 'scale(' + mapScale.toFixed(2) + ')';
 }
 $('#zoomIn').addEventListener('click', function () { zoom(0.15); });
 $('#zoomOut').addEventListener('click', function () { zoom(-0.15); });
+
+/* ---------- 高德地图：在线时接管地图区；无 Key / 断网 / 超时保留离线快照 ---------- */
+async function initMap() {
+  routeMap = await mountRouteMap($('#amapMap'), {
+    origin: DB.camping.origin,
+    destination: current
+  });
+  if (!routeMap) return;
+  /* 容器此前为 0×0：先显示，再让高德重算尺寸，最后规划首条路线 */
+  mapCanvas.classList.add('is-amap');
+  routeMap.resize();
+  routeMap.setDestination(current);
+  setProvider('高德地图 · 实时路况', false);
+}
+initMap();
 
 /* ---------- 初始状态 ---------- */
 renderDestination(current, {

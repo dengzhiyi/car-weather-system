@@ -9,3 +9,6 @@ Thumbs.db
 *.zip
 .idea/
 .vscode/
+.env
+.env.local
+.env.*.local

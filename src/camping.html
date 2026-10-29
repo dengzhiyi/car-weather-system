@@ -36,9 +36,10 @@
               <span class="ch-ic" data-icon="map"></span>
               <h3>路线预览</h3>
             </div>
-            <span class="map-provider"><span data-icon="navigation"></span>高德地图 · 实时路况</span>
+            <span class="map-provider is-offline"><span data-icon="navigation"></span><span id="mapProviderText">示意图 · 离线</span></span>
           </div>
           <div class="map-canvas">
+            <div class="map-amap" id="amapMap" aria-label="高德地图 · 目的地路线"></div>
             <svg class="map-art" id="mapArt" viewBox="0 0 800 520" preserveAspectRatio="xMidYMid slice" aria-label="目的地路线示意地图">
               <defs>
                 <pattern id="cwGrid" width="46" height="46" patternUnits="userSpaceOnUse">
@@ -98,6 +99,7 @@
                 <text x="-3" y="30" fill="#93A7B8" font-size="11">N</text>
               </g>
             </svg>
+            <img class="map-shot" id="mapShot" alt="离线地图" hidden>
             <span class="map-scale">1 km</span>
             <span class="map-chip map-dest"><span data-icon="flag"></span><span id="mapDestChip">大鹏半岛西涌营地</span></span>
             <span class="map-chip map-dist"><span data-icon="route"></span><span id="mapDistance">58 km</span> · <span id="mapDuration">1 小时 05 分</span></span>

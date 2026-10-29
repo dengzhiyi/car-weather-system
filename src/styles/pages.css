@@ -375,6 +375,20 @@
 .map-head .card-head { margin: 0; }
 .map-provider { display: inline-flex; align-items: center; gap: 7px; font-size: var(--fs-3xs); color: var(--aqua); }
 .map-provider svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+.map-provider.is-offline { color: var(--text-dim); }
+/* 高德地图接管层：加载成功时覆盖示意 SVG，离线/无 Key 时保持示意地图 */
+.map-amap { position: absolute; inset: 0; z-index: 1; display: none; }
+.map-canvas.is-amap .map-amap { display: block; }
+.map-canvas.is-amap .map-art { display: none; }
+/* 离线真实地图快照：无网时默认展示，加载失败再退回 SVG 示意 */
+.map-shot {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: 1;
+  transition: transform .4s var(--ease); transform-origin: 50% 55%;
+}
+.map-shot[hidden] { display: none; }
+.map-canvas.is-shot .map-art { display: none; }
+.map-canvas.is-amap .map-shot { display: none; }
 .map-canvas { position: relative; flex: 1; min-height: 400px; overflow: hidden; background: #081118; }
 .map-art { position: absolute; inset: 0; width: 100%; height: 100%; transition: transform .4s var(--ease); transform-origin: 50% 55%; }
 .map-art text { font-family: var(--body); }
