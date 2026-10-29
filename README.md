@@ -2,8 +2,9 @@
 
 车载场景下的气象监测与出行辅助前端原型。5 个页面、Vite 多页构建、零运行时依赖，构建产物可直接离线部署。默认监测点为 **深圳坪山 · 比亚迪总部**。
 
-> 当前为 **UI 原型阶段**：雨量传感器、山洪短临预报、露营与钓点天气仍来自 `src/data/mock.js`；
-> **首页实况与逐时预报已接入真实天气接口**（见下文「天气数据接入」）。
+> 当前为 **UI 原型阶段**：雨量传感器、山洪短临预报与钓点气象仍来自 `src/data/mock.js`；
+> **首页实况/逐时预报**与**露营到达天气**已接入真实天气接口（见下文「天气数据接入」），
+> 时间类文案（更新时间、预计到达、逐时时刻）一律按系统时钟推算。
 
 ## 页面
 
@@ -88,6 +89,7 @@ npm test          # 运行 domain 规则单测
 | 缓存 | 适配层内存缓存 5 分钟，避免每次进页重复拉取 10 天数据 |
 | 跨域 | 接口无 CORS 头，浏览器侧统一走同源代理 `/api/tj/*` → `https://api.tjweather.com/*`（见 `vite.config.ts` 的 `weatherProxy`）；Capacitor Native 环境直连服务端 |
 | 降级 | 代理不可用 / 订阅异常时自动退回 `src/data/mock.js`，看板结构不变、不报错 |
+| 实时性 | 返回序列起点并不等于当前时刻，实况与逐时基准均取「距当前最近的时间点」；首页更新时间秒级跟随系统时钟，看板每分钟重渲染一次，天气数据受 5 分钟缓存保护，不会额外请求接口 |
 
 要素只有 6 个，云量、体感温度、能见度、降水概率不在订阅范围内，因此由 [weather.view.js](file:///workspace/car-weather-system/src/domain/weather.view.js) 按经验口径换算（风向→八方位、风速→蒲福风级、降水强度→天气现象/概率、湿度与降水→能见度、气压 24h 变化→趋势），仅用于展示，不参与任何预警判定。
 
@@ -95,11 +97,11 @@ npm test          # 运行 domain 规则单测
 
 ## 高德地图（可选）
 
-露营页「路线预览」分三层，按可用性自动接管：
+露营页「路线预览」与山洪预警页「目的地 · 山洪影响区」共用同一套地图，分三层按可用性自动接管：
 
-1. **在线高德**（配置 Key 且联网）：实时瓦片 + 路况图层 + 真实道路驾车路线
-2. **离线真实地图**（无网 / CDN 不可达）：`src/public/map/<目的地>.jpg` 真实地图快照，随目的地切换
-3. **SVG 示意地图**（快照缺失）：纯内嵌矢量兜底
+1. **在线高德**（配置 Key 且联网）：浅色标准底图（`amap://styles/normal`）+ 实时路况图层 + 真实道路驾车路线
+2. **离线真实地图**（无网 / CDN 不可达）：`src/public/map/<目的地>.jpg` 真实地图快照，随目的地切换（山洪页固定马峦山）
+3. **SVG 示意地图 / 地形示意**（快照缺失）：纯内嵌矢量兜底
 
 ```bash
 cp .env.example src/.env.local   # 本工程 vite root 为 src，env 文件必须放在 src/ 下
@@ -131,7 +133,7 @@ npm run check:dist   # 需先 npm run build
 
 - `src/data/mock.js` → `export { DB }`：所有 mock 原始读数的唯一来源
 - `src/domain/*`：纯函数规则，`rainLevelOf` / `rainAssistPlan` / `evaluateFlood` / `fishingScore` / `pressureStateOf`，以及天气展示口径 `windTextOf` / `skyOf` / `rainChanceOf` / `feelsOf` / `visibilityOf` / `pressureTrendOf`
-- `src/adapters/*`：`Sensor.readVehicleRain / readBasinGauge`、`Weather.readSeries`（真实接口）/ `readBasinForecast / readArrivalBrief / readFishingSpot`（mock）、`Amap.searchDestination`（含 `routePath` 真实路线几何）/ `planRoute`
+- `src/adapters/*`：`Sensor.readVehicleRain / readBasinGauge`、`Weather.readSeries`（真实接口，首页与露营到达天气共用）/ `readBasinForecast / readArrivalBrief / readFishingSpot`（mock；`readArrivalBrief` 只提供舒适度/装备/安全文案与兜底要素，到达时刻的天气由 api 层按目的地经纬度取真实序列计算）、`Amap.searchDestination`（含 `routePath` 真实路线几何）/ `planRoute`
 - `src/api/api.js` → `export { Api }`：`getDashboard / setRainAssist / planDestination / getFloodStatus / getFishingWindow`，每个函数标注了预期的 HTTP method 与 path，接后端时只替换 adapters 实现，本层返回结构不变
 - `src/core/icons.js`：`data-icon="name"` 挂载内联 SVG，无 CDN、无字体图标
 

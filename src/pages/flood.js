@@ -2,6 +2,8 @@
 import '../core/app.js';
 import { $, $$, toast, icons } from '../core/dom.js';
 import { Api } from '../api/api.js';
+import { DB } from '../data/mock.js';
+import { mountRouteMap } from '../maps/amap.js';
 import { evaluateFlood } from '../domain/flood.rules.js';
 
 /* 渲染主函数 */
@@ -137,3 +139,29 @@ $('#muteBtn').addEventListener('click', function () {
 
 /* ---------- 首次载入 ---------- */
 render('normal');
+
+/* ---------- 目的地地图栏：在线高德 > 离线快照 > SVG 地形示意 ---------- */
+const terrainBox = $('#destTerrainBox');
+const floodShot = $('#floodShot');
+const destRecord = DB.camping.destinations.find(function (d) { return d.id === 'malun'; });
+
+/* 离线时展示真实地图快照，快照缺失则保留 SVG 地形示意 */
+function showShot() {
+  if (!floodShot || !destRecord) return;
+  floodShot.onload = function () {
+    floodShot.hidden = false;
+    terrainBox.classList.add('is-shot');
+  };
+  floodShot.onerror = function () { floodShot.hidden = true; };
+  floodShot.src = 'map/' + destRecord.id + '.jpg';
+}
+
+mountRouteMap($('#floodMapCanvas'), {
+  origin: DB.camping.origin,
+  destination: destRecord
+}).then(function (routeMap) {
+  if (!routeMap) { showShot(); return; }
+  terrainBox.classList.add('is-amap');
+  routeMap.resize();
+  routeMap.setDestination(destRecord);
+});

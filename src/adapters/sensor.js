@@ -8,13 +8,12 @@ import { DB } from '../data/mock.js';
 
 /**
  * 车载雨量传感器当前读数
- * @returns {Promise<{sensorId:string,rate:number,cumulative:number,delta10m:number,
+ * @returns {Promise<{rate:number,cumulative:number,delta10m:number,
  *   sampleRate:string,status:string,thresholds:Array,history30m:number[],history60m:number[]}>}
  */
 async function readVehicleRain() {
   const r = DB.rain;
   return {
-    sensorId: r.sensorId,
     rate: r.rate,
     cumulative: r.cumulative,
     delta10m: r.delta10m,

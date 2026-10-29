@@ -64,7 +64,7 @@ export async function mountRouteMap(host, options) {
     map = new AMap.Map(host, {
       zoom: 11,
       viewMode: '2D',
-      mapStyle: 'amap://styles/darkblue',
+      mapStyle: 'amap://styles/normal',
       showLabel: true,
       resizeEnable: true
     });
@@ -123,14 +123,14 @@ export async function mountRouteMap(host, options) {
     drawn = [
       new AMap.Polyline({
         path: path,
-        strokeColor: '#0A1219',
+        strokeColor: '#FFFFFF',
         strokeWeight: 10,
-        strokeOpacity: 0.9,
+        strokeOpacity: 0.95,
         lineJoin: 'round'
       }),
       new AMap.Polyline({
         path: path,
-        strokeColor: '#6BB8FF',
+        strokeColor: '#1677FF',
         strokeWeight: real ? 6 : 4,
         strokeOpacity: 0.95,
         strokeStyle: real ? 'solid' : 'dashed',

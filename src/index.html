@@ -33,13 +33,22 @@
           <span><span data-icon="sunrise"></span>06:12</span>
           <span><span data-icon="sunset"></span>17:24</span>
           <span class="sep"></span>
-          <span class="meta-live"><span class="live-dot"></span>更新 <b id="updatedAt">14:32:08</b></span>
+          <span class="meta-live"><span class="live-dot"></span>更新 <b id="updatedAt">--:--:--</b></span>
         </div>
       </section>
       <div class="hero-glyph" id="heroIcon" data-icon="cloud-lightning" aria-hidden="true"></div>
 
       <!-- 底部胶囊组 -->
       <section class="pods">
+        <article class="pod pod-fc">
+          <div class="pod-head">
+            <span class="h-ic" data-icon="cloud-rain"></span>
+            <h3>未来 5 小时</h3>
+            <span class="h-tag tag tag-ok" id="miniHint"><span class="live-dot"></span><span id="miniHintText">降水峰值 16:30 · 90%</span></span>
+          </div>
+          <div class="mini-list" id="miniForecast"></div>
+        </article>
+
         <article class="pod pod-rain">
           <div class="pod-head">
             <span class="h-ic" data-icon="droplets"></span>
@@ -57,15 +66,6 @@
             <span>近 10 分钟<b id="rainDelta">+3.2 mm</b></span>
             <span>累计雨量<b id="rainTotal">18.4 mm</b></span>
           </div>
-        </article>
-
-        <article class="pod pod-fc">
-          <div class="pod-head">
-            <span class="h-ic" data-icon="cloud-rain"></span>
-            <h3>未来 5 小时</h3>
-            <span class="h-tag tag tag-ok" id="miniHint"><span class="live-dot"></span><span id="miniHintText">降水峰值 16:30 · 90%</span></span>
-          </div>
-          <div class="mini-list" id="miniForecast"></div>
         </article>
 
         <article class="pod pod-env">

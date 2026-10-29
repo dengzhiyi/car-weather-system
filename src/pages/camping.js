@@ -3,6 +3,7 @@ import '../core/app.js';
 import { $, $$, toast, icons } from '../core/dom.js';
 import { DB } from '../data/mock.js';
 import { Api } from '../api/api.js';
+import { clockOf, minutesOfDuration } from '../core/time.js';
 import { mountRouteMap } from '../maps/amap.js';
 
 const list = DB.camping.destinations;
@@ -12,6 +13,7 @@ let current = list.find(function (d) { return d.id === DEFAULT_DEST_ID; }) || li
 let busy = false;
 let mapScale = 1;
 let routeMap = null;
+let state = null;
 
 const input = $('#destInput');
 const searchBox = $('#searchBox');
@@ -31,21 +33,39 @@ function markChips(id) {
   });
 }
 
+/* ---------- 时间文案：到达时刻与逐时一律按系统时钟推算 ---------- */
+function arrivalMsOf(route) {
+  return Date.now() + minutesOfDuration(route.duration) * 60 * 1000;
+}
+
+function paintTimes() {
+  if (!state) return;
+  const arrivalMs = arrivalMsOf(state.route);
+  const arrival = clockOf(arrivalMs);
+  $('#routeMeta').textContent = state.route.distance + ' · ' + state.route.duration + ' · 预计 ' + arrival + ' 到达';
+  $('#arrArrival').textContent = '预计 ' + arrival + ' 到达';
+  const times = $$('#arrHourly .hr-time');
+  (state.dest.hourly || []).forEach(function (h, i) {
+    if (!times[i]) return;
+    const offset = typeof h.offset === 'number' ? h.offset : i * 60;
+    times[i].textContent = clockOf(arrivalMs + offset * 60 * 1000);
+  });
+}
+
 /* ---------- 渲染到达信息 ---------- */
 function renderDestination(dest, route) {
   current = dest;
+  state = { dest: dest, route: route };
   input.value = dest.name;
   $('#campStatusText').textContent = '目的地：' + dest.name;
   $('#mapDestChip').textContent = dest.name;
   $('#mapDestLabel').textContent = dest.name;
   $('#mapDistance').textContent = route.distance;
   $('#mapDuration').textContent = route.duration;
-  $('#routeMeta').textContent = route.distance + ' · ' + route.duration + ' · 预计 ' + route.arrival + ' 到达';
   $('#adviceDest').textContent = dest.name;
 
   $('#arrTemp').textContent = dest.temp;
   $('#arrCond').textContent = dest.condition;
-  $('#arrArrival').textContent = '预计 ' + route.arrival + ' 到达';
   $('#arrRain').textContent = dest.rainChance + '%';
   $('#arrWind').textContent = dest.wind;
   $('#arrPressure').textContent = dest.pressure + ' hPa';
@@ -60,10 +80,12 @@ function renderDestination(dest, route) {
   iconEl.setAttribute('data-icon', dest.icon);
   iconEl.removeAttribute('data-icon-ready');
 
-  $('#arrHourly').innerHTML = dest.hourly.map(function (h) {
+  const arrivalMs = arrivalMsOf(route);
+  $('#arrHourly').innerHTML = dest.hourly.map(function (h, i) {
+    const offset = typeof h.offset === 'number' ? h.offset : i * 60;
     return (
       '<div class="hr-item">' +
-        '<span class="hr-time">' + h.time + '</span>' +
+        '<span class="hr-time">' + clockOf(arrivalMs + offset * 60 * 1000) + '</span>' +
         '<span class="hr-ic" data-icon="' + h.icon + '"></span>' +
         '<span class="hr-temp">' + h.temp + '°</span>' +
         '<span class="hr-rain">降水 ' + h.rain + '%</span>' +
@@ -84,10 +106,11 @@ function renderDestination(dest, route) {
   if (routeMap) routeMap.setDestination(dest);
   else showShot(dest);
   icons(document);
+  paintTimes();
 }
 
 /* ---------- 设定目的地（调用 API stub） ---------- */
-async function plan(query) {
+async function plan(query, silent) {
   if (busy) return;
   const q = String(query == null ? input.value : query).trim();
   if (!q) {
@@ -114,7 +137,7 @@ async function plan(query) {
     return;
   }
   renderDestination(res.data.destination, res.data.route);
-  toast('目的地已设定 · 高德路线与天气已同步', 'ok');
+  if (!silent) toast('目的地已设定 · 高德路线与天气已同步', 'ok');
 }
 
 planBtn.addEventListener('click', function () { plan(); });
@@ -207,7 +230,12 @@ initMap();
 /* ---------- 初始状态 ---------- */
 renderDestination(current, {
   distance: current.distance,
-  duration: current.duration,
-  arrival: current.arrival
+  duration: current.duration
 });
+
+/* 默认目的地静默同步一次真实路线与到达天气（失败时保留 mock 快照） */
+plan(current.name, true);
+
+/* 到达时刻与逐时随系统时钟滚动 */
+setInterval(paintTimes, 30 * 1000);
 

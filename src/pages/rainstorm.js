@@ -130,7 +130,7 @@ function applyState(on, persist) {
   speedArc.setAttribute('stroke-dasharray', plan.gaugePercent.toFixed(1) + ' 100');
   followVal.textContent = plan.followMeters + ' m · ' + plan.followSeconds.toFixed(1) + ' s';
   gapMeters.textContent = plan.followMeters + ' m';
-  $('#assistLog').textContent = 'RS-04 · 最近同步 ' + nowTime() + (on ? ' · 策略生效' : '');
+  $('#assistLog').textContent = '最近同步 ' + nowTime() + (on ? ' · 策略生效' : '');
 
   if (persist) {
     try { localStorage.setItem('cw.assist', on ? '1' : '0'); } catch (e) {}

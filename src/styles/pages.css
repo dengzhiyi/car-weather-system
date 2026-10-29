@@ -389,7 +389,7 @@
 .map-shot[hidden] { display: none; }
 .map-canvas.is-shot .map-art { display: none; }
 .map-canvas.is-amap .map-shot { display: none; }
-.map-canvas { position: relative; flex: 1; min-height: 400px; overflow: hidden; background: #081118; }
+.map-canvas { position: relative; flex: 1; min-height: 400px; overflow: hidden; background: #EAF0F5; }
 .map-art { position: absolute; inset: 0; width: 100%; height: 100%; transition: transform .4s var(--ease); transform-origin: 50% 55%; }
 .map-art text { font-family: var(--body); }
 .map-chip {
@@ -539,8 +539,13 @@
 .dest-card { display: flex; flex-direction: column; }
 .dest-title { display: flex; align-items: center; gap: 8px; }
 .dest-title h3 { font-family: var(--display); font-size: var(--fs-md); font-weight: 700; }
-.dest-terrain { position: relative; height: 100px; margin: 12px 0 14px; border-radius: 10px; overflow: hidden; background: #0a1a18; border: 1px solid var(--border); }
+.dest-terrain { position: relative; height: 132px; margin: 12px 0 14px; border-radius: 10px; overflow: hidden; background: #0a1a18; border: 1px solid var(--border); }
 .dest-terrain svg { width: 100%; height: 100%; }
+/* 山洪页地图栏：在线高德 > 离线真实地图快照 > SVG 地形示意 */
+.dest-terrain.is-amap { background: #EAF0F5; }
+.dest-terrain.is-amap .map-amap { display: block; }
+.dest-terrain.is-amap svg,
+.dest-terrain.is-shot svg { display: none; }
 .dest-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .dest-meta div { padding: 9px 11px; border-radius: 9px; background: rgba(255,255,255,.026); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 2px; }
 .dest-meta span { font-size: var(--fs-3xs); color: var(--text-dim); }
@@ -629,7 +634,7 @@
    只在用户真的开启了系统大字号时才让内容滚动，其余保持一屏。 */
 @media (max-height: 1010px) {
   .grid { gap: 12px; }
-  .content { padding-top: 4px; padding-bottom: 10px; }
+  .content { padding-top: 4px; padding-bottom: 20px; }
   .page-head { min-height: 44px; margin-bottom: 10px; }
   .page-title { font-size: 24px; }
   .card { padding: 13px 16px 12px; }
@@ -673,7 +678,7 @@
   .mon-foot { margin-top: 9px; padding-top: 8px; }
   .rule-list { gap: 6px; }
   .rule-row { padding: 8px 10px; }
-  .dest-terrain { height: 82px; margin: 9px 0 11px; }
+  .dest-terrain { height: 110px; margin: 9px 0 11px; }
   .dest-meta div { padding: 7px 10px; }
   .notify-row { padding: 8px 0; }
   .history-list li { padding: 5px 0; }
@@ -688,7 +693,7 @@
   body.is-alert .mon-foot { margin-top: 7px; padding-top: 6px; }
   body.is-alert .logic-note { margin-top: 6px; }
   body.is-alert .flood-main, body.is-alert .flood-dest-stack { gap: 10px; }
-  body.is-alert .dest-terrain { height: 58px; margin: 6px 0 8px; }
+  body.is-alert .dest-terrain { height: 84px; margin: 6px 0 8px; }
   body.is-alert .notify-row { padding: 5px 0; }
   body.is-alert .history-list li { padding: 4px 0; }
 

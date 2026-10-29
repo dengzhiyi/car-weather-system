@@ -67,6 +67,9 @@ describe('Weather.readSeries', () => {
 
 describe('Api.getDashboard 天气映射', () => {
   it('实况与逐时预报按展示口径换算', async () => {
+    /* 只伪造 Date，保留真实 setTimeout（Api 内部有模拟时延） */
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(Date.parse('2026-10-26T21:00+08:00'));
     stubFetch(async function () {
       return { ok: true, json: async function () { return fixture(); } };
     });
@@ -94,6 +97,21 @@ describe('Api.getDashboard 天气映射', () => {
     expect(hourly[5].label).toBe('5 小时后');
     expect(hourly[0].temp).toBe(25);
     expect(hourly[4].temp).toBe(24);
+    vi.useRealTimers();
+  });
+
+  it('实况点取距当前最近的一点，而不是序列首点', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(Date.parse('2026-10-26T23:00+08:00'));
+    stubFetch(async function () {
+      return { ok: true, json: async function () { return fixture(); } };
+    });
+    const res = await Api.getDashboard();
+    expect(res.data.weather.updatedAt).toBe('23:00');
+    expect(res.data.forecast5h[0].time).toBe('23:00');
+    expect(res.data.forecast5h[0].label).toBe('现在');
+    expect(res.data.forecast5h[1].time).toBe('00:00');
+    vi.useRealTimers();
   });
 
   it('接口不可用时退回本地 mock，看板结构不变', async () => {

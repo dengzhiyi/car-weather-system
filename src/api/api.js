@@ -5,6 +5,7 @@
 */
 import { DB } from '../data/mock.js';
 import { SITE } from '../config/site.js';
+import { clockOf, minutesOfDuration } from '../core/time.js';
 import { Sensor } from '../adapters/sensor.js';
 import { Weather } from '../adapters/weather.js';
 import { Amap } from '../adapters/amap.js';
@@ -22,6 +23,8 @@ import {
 
 /* 逐时预报取当前 + 未来 5 小时，每小时一列（首页去掉当前档展示 5 档） */
 const HOURLY_OFFSETS = [0, 60, 120, 180, 240, 300];
+/* 目的地到达时段逐时：到达后 0 / 1 / 2 小时 */
+const ARRIVAL_OFFSETS = [0, 60, 120];
 
 /* 首页功能卡上的评级短文案 */
 const FISHING_RATING_SHORT = {
@@ -39,7 +42,8 @@ function sceneOf(mode) {
   return mode === 'alert' ? 'alert' : 'normal';
 }
 
-/* 首页功能卡：钓鱼指标由规则现算，避免快照文案与钓鱼页结论不一致 */
+/* 首页功能卡：钓鱼指标由规则现算，避免快照文案与钓鱼页结论不一致；
+   露营到达时间按系统时钟 + 路线时长推算 */
 function featuresWithLiveMetric() {
   const spot = DB.fishing.spots[0];
   const score = fishingScore({
@@ -48,11 +52,20 @@ function featuresWithLiveMetric() {
     windSpeed: spot.windSpeed,
     gust: spot.gust
   });
+  const camp = DB.camping.destinations[0];
+  const campArrival = clockOf(Date.now() + minutesOfDuration(camp.duration) * 60 * 1000);
   return DB.features.map(function (f) {
-    if (f.id !== 'fishing') return f;
-    return Object.assign({}, f, {
-      metric: score.score + ' 分 · ' + FISHING_RATING_SHORT[score.rating]
-    });
+    if (f.id === 'fishing') {
+      return Object.assign({}, f, {
+        metric: score.score + ' 分 · ' + FISHING_RATING_SHORT[score.rating]
+      });
+    }
+    if (f.id === 'camping') {
+      return Object.assign({}, f, {
+        sub: '到达 ' + campArrival + ' · ' + camp.condition + ' ' + camp.temp + '°C'
+      });
+    }
+    return f;
   });
 }
 
@@ -65,9 +78,17 @@ function pointAt(series, targetAt) {
   return nearest;
 }
 
+/* 实况点：接口序列首点是序列起点而非「现在」，取距当前时刻最近的一点；
+   同时限制在序列时间范围内，避免落到区间外的远端预报 */
+function currentPoint(series) {
+  const first = series[0];
+  const last = series[series.length - 1];
+  return pointAt(series, Math.min(last.at, Math.max(first.at, Date.now())));
+}
+
 /* 实况点 → 看板天气对象（展示口径换算见 domain/weather.view.js） */
 function describeWeather(series, site) {
-  const now = series[0];
+  const now = currentPoint(series);
   const dayLater = pointAt(series, now.at + 24 * 60 * 60 * 1000);
   const sky = skyOf(now.rainRate, now.humidity);
   return {
@@ -87,12 +108,15 @@ function describeWeather(series, site) {
   };
 }
 
+/* 逐时预报的时刻一律按系统时钟推算（数据点取距该时刻最近的一档），
+   避免接口序列起点较早时，页面时间停在固定档位随不了系统时间 */
 function describeHourly(series) {
+  const nowAt = Date.now();
   return HOURLY_OFFSETS.map(function (offset) {
-    const point = pointAt(series, series[0].at + offset * 60 * 1000);
+    const point = pointAt(series, nowAt + offset * 60 * 1000);
     const sky = skyOf(point.rainRate, point.humidity);
     return {
-      time: String(point.time).slice(11, 16),
+      time: clockOf(nowAt + offset * 60 * 1000),
       label: offset === 0 ? '现在' : offset / 60 + ' 小时后',
       temp: Math.round(point.temp),
       icon: sky.icon,
@@ -100,6 +124,40 @@ function describeHourly(series) {
       wind: Math.round(point.windSpeed * 3.6)
     };
   });
+}
+
+/* 兜底快照没有时间戳偏移，按数组序号（每小时一档）对齐系统时钟 */
+function withClockTimes(forecast) {
+  const nowAt = Date.now();
+  return forecast.map(function (f, i) {
+    const offset = typeof f.offset === 'number' ? f.offset : i * 60;
+    return Object.assign({}, f, { offset: offset, time: clockOf(nowAt + offset * 60 * 1000) });
+  });
+}
+
+/* 目的地到达时段天气：取距到达时刻最近的一点，逐时按到达后 0/1/2 小时 */
+function arrivalWeatherOf(series, arrivalAt) {
+  const point = pointAt(series, arrivalAt);
+  const sky = skyOf(point.rainRate, point.humidity);
+  return {
+    temp: Math.round(point.temp),
+    condition: sky.condition,
+    icon: sky.icon,
+    rainChance: rainChanceOf(point.rainRate),
+    wind: windTextOf(point.windDeg, point.windSpeed),
+    pressure: Math.round(point.pressure),
+    visibility: visibilityOf(point.humidity, point.rainRate) + ' km',
+    hourly: ARRIVAL_OFFSETS.map(function (offset) {
+      const p = pointAt(series, arrivalAt + offset * 60 * 1000);
+      const s = skyOf(p.rainRate, p.humidity);
+      return {
+        offset: offset,
+        temp: Math.round(p.temp),
+        icon: s.icon,
+        rain: rainChanceOf(p.rainRate)
+      };
+    })
+  };
 }
 
 /* GET /api/dashboard  →  { vehicle, weather, rain, forecast5h, features } */
@@ -114,9 +172,9 @@ async function getDashboard() {
     weather = describeWeather(series, SITE);
     forecast5h = describeHourly(series);
   } catch (error) {
-    /* 接口不可用（断网 / 订阅异常）时退回本地 mock，保证看板可用 */
+    /* 接口不可用（断网 / 订阅异常）时退回本地 mock，保证看板可用；时间仍跟随系统时钟 */
     weather = DB.weather;
-    forecast5h = DB.forecast5h;
+    forecast5h = withClockTimes(DB.forecast5h);
   }
   return {
     code: 0,
@@ -153,7 +211,7 @@ async function setRainAssist(payload) {
         followMeters: plan.followMeters,
         notice: plan.notice
       },
-      source: 'rain-sensor ' + rain.sensorId,
+      source: 'rain-sensor',
       syncedAt: new Date().toISOString()
     }
   };
@@ -169,13 +227,27 @@ async function planDestination(payload) {
     return { code: 404, message: '未找到目的地', data: null };
   }
   const route = await Amap.planRoute(dest);
+  /* 到达时刻 = 当前系统时间 + 路线时长；逐时天气按该时刻向后推算 */
+  const arrivalAt = Date.now() + minutesOfDuration(route.duration) * 60 * 1000;
   const brief = await Weather.readArrivalBrief(dest.id);
+  let live = null;
+  try {
+    const series = await Weather.readSeries({
+      name: dest.name,
+      lon: dest.lng,
+      lat: dest.lat,
+      tz: 8
+    });
+    live = arrivalWeatherOf(series, arrivalAt);
+  } catch (error) {
+    /* 目的地天气接口不可用（断网 / 订阅异常）时沿用本地快照 */
+  }
   return {
     code: 0,
     data: {
       /* 地图地理信息 + 到达时段天气合并为页面所需的单一目的地对象 */
-      destination: Object.assign({}, dest, brief),
-      route: Object.assign({}, route, { synced: true })
+      destination: Object.assign({}, dest, brief, live || {}),
+      route: Object.assign({}, route, { arrival: clockOf(arrivalAt), arrivalAt: arrivalAt, synced: true })
     }
   };
 }

@@ -37,7 +37,7 @@
       <div class="alert-banner" id="alertBanner" hidden>
         <span class="ab-ic" data-icon="siren"></span>
         <div class="ab-copy">
-          <b>山洪橙色预警 · 深圳七娘山溪谷</b>
+          <b>山洪橙色预警 · 深圳马峦山溪谷营地</b>
           <p>雨量传感器 52.4 mm/h 已超暴雨阈值，未来 2 小时流域累计降水 68 mm，建议立即驶离沟谷。</p>
         </div>
         <div class="ab-actions">
@@ -78,7 +78,7 @@
             </div>
             <div class="monitor-grid">
               <div class="mon-left">
-                <span class="mon-label">雨量传感器 · RS-04</span>
+                <span class="mon-label">雨量传感器</span>
                 <div class="mon-big">
                   <span class="num-xl" id="monRate">12.6</span>
                   <span class="unit">mm/h</span>
@@ -121,11 +121,14 @@
             </div>
             <div class="dest-title">
               <div>
-                <h3 id="destName">深圳 · 七娘山溪谷</h3>
-                <span class="dim mono" id="destCoord">22.5388° N, 114.5286° E</span>
+                <h3 id="destName">深圳 · 马峦山溪谷营地</h3>
+                <span class="dim mono" id="destCoord">22.6322° N, 114.3385° E</span>
               </div>
             </div>
-            <div class="dest-terrain">
+            <div class="dest-terrain" id="destTerrainBox">
+              <!-- 在线高德地图 / 离线真实地图快照 / SVG 地形示意，三级兜底 -->
+              <div class="map-amap" id="floodMapCanvas"></div>
+              <img class="map-shot" id="floodShot" hidden alt="马峦山溪谷营地 · 离线地图">
               <svg viewBox="0 0 300 96" preserveAspectRatio="none" aria-label="沟谷地形示意">
                 <rect width="300" height="96" fill="#08160F"></rect>
                 <path d="M-10 20 C60 4 110 30 170 14 C230 -2 280 18 310 8" fill="none" stroke="#19402F" stroke-width="1.2"></path>
@@ -140,9 +143,9 @@
               </svg>
             </div>
             <div class="dest-meta">
-              <div><span>距离</span><b id="destDistance">34 km</b></div>
-              <div><span>地形</span><b id="destTerrain">沟谷汇水区</b></div>
-              <div><span>海拔</span><b id="destElevation">620 m</b></div>
+              <div><span>距离</span><b id="destDistance">18 km</b></div>
+              <div><span>地形</span><b id="destTerrain">溪谷汇水区</b></div>
+              <div><span>海拔</span><b id="destElevation">260 m</b></div>
               <div><span>响应时间</span><b id="destResponse">14 min</b></div>
             </div>
           </article>

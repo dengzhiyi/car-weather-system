@@ -22,7 +22,7 @@
   --screen-w: 1600px;
   --screen-h: 960px;
   --sys-top: 30px;
-  --sys-bottom: 24px;
+  --sys-bottom: 12px;
   --safe-top: max(var(--sys-top), env(safe-area-inset-top, 0px));
   --safe-bottom: max(var(--sys-bottom), env(safe-area-inset-bottom, 0px));
   --gutter: 44px;

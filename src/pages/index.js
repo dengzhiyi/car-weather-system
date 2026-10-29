@@ -2,6 +2,7 @@
 import '../core/app.js';
 import { $, icons } from '../core/dom.js';
 import { Api } from '../api/api.js';
+import { clockSecondsOf } from '../core/time.js';
 import { visibilityHintOf, humidityHintOf, rainHintOf } from '../domain/weather.view.js';
 
 function levelClass(i) {
@@ -18,7 +19,7 @@ async function renderDashboard() {
   $('#heroCondition').textContent = d.weather.condition;
   $('#heroFeels').textContent = d.weather.feels + '°';
   $('#heroRainChance').textContent = d.weather.rainChance + '%';
-  $('#updatedAt').textContent = d.weather.updatedAt || '14:32:08';
+  $('#updatedAt').textContent = clockSecondsOf();
   const heroIcon = $('#heroIcon');
   heroIcon.setAttribute('data-icon', d.weather.icon);
   heroIcon.removeAttribute('data-icon-ready');
@@ -106,3 +107,12 @@ async function renderDashboard() {
 }
 
 renderDashboard();
+
+/* 更新时间跟随系统时钟（秒级） */
+setInterval(function () {
+  $('#updatedAt').textContent = clockSecondsOf();
+}, 1000);
+
+/* 看板每分钟重新渲染一次：时间类文案按系统时钟刷新，
+   天气数据受适配层 5 分钟缓存保护，不会额外请求接口 */
+setInterval(renderDashboard, 60 * 1000);
