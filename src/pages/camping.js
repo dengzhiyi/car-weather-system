@@ -6,7 +6,9 @@ import { Api } from '../api/api.js';
 import { mountRouteMap } from '../maps/amap.js';
 
 const list = DB.camping.destinations;
-let current = list[0];
+/* 默认目的地：马峦山溪谷营地（离总部最近，溪谷天气更具代表性） */
+const DEFAULT_DEST_ID = 'malun';
+let current = list.find(function (d) { return d.id === DEFAULT_DEST_ID; }) || list[0];
 let busy = false;
 let mapScale = 1;
 let routeMap = null;
@@ -195,6 +197,7 @@ async function initMap() {
   if (!routeMap) return;
   /* 容器此前为 0×0：先显示，再让高德重算尺寸，最后规划首条路线 */
   mapCanvas.classList.add('is-amap');
+  clearShot();
   routeMap.resize();
   routeMap.setDestination(current);
   setProvider('高德地图 · 实时路况', false);

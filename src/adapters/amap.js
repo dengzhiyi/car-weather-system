@@ -9,7 +9,7 @@ import { DB } from '../data/mock.js';
 /**
  * 目的地检索
  * @param {string} query 用户输入的关键词（空串返回首个候选）
- * @returns {Promise<{id:string,name:string,region:string,coord:string,lat:number,lng:number}|null>}
+ * @returns {Promise<{id:string,name:string,region:string,coord:string,lat:number,lng:number,routePath:number[][]}|null>}
  */
 async function searchDestination(query) {
   const q = String(query || '').trim().toLowerCase();
@@ -24,7 +24,9 @@ async function searchDestination(query) {
     coord: dest.coord || null,
     /* WGS-84 原始坐标，上图前由 maps/geo.js 转 GCJ-02 */
     lat: dest.lat,
-    lng: dest.lng
+    lng: dest.lng,
+    /* 起点到该目的地的真实驾车路线几何（WGS-84，[lng, lat]） */
+    routePath: dest.routePath || null
   };
 }
 

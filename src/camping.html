@@ -25,7 +25,7 @@
           </div>
         </div>
         <div class="head-actions">
-          <span class="status-pill" id="campStatus"><span data-icon="route"></span><span id="campStatusText">目的地：大鹏半岛西涌营地</span></span>
+          <span class="status-pill" id="campStatus"><span data-icon="route"></span><span id="campStatusText">目的地：马峦山溪谷营地</span></span>
         </div>
       </section>
 
@@ -86,8 +86,8 @@
                 <path d="M0 -4 C-10 -18 -13 -24 -13 -30 A13 13 0 1 1 13 -30 C13 -24 10 -18 0 -4Z" transform="translate(0 8)" fill="#FFB35C" stroke="#0B1720" stroke-width="2"></path>
                 <circle cy="-30" r="4.5" fill="#0B1720"></circle>
               </g>
-              <text id="mapDestLabel" x="640" y="166" fill="#FFD7A6" font-size="15">大鹏半岛西涌营地</text>
-              <text x="640" y="186" fill="#7C94A7" font-size="12">海拔 20 m · 海滨营地</text>
+              <text id="mapDestLabel" x="640" y="166" fill="#FFD7A6" font-size="15">马峦山溪谷营地</text>
+              <text x="640" y="186" fill="#7C94A7" font-size="12">海拔 260 m · 溪谷营地</text>
 
               <text x="360" y="452" fill="#5E7689" font-size="12" transform="rotate(-14 360 452)">坪葵路</text>
               <text x="470" y="300" fill="#5E7689" font-size="12" transform="rotate(-28 470 300)">惠深沿海高速</text>
@@ -101,8 +101,8 @@
             </svg>
             <img class="map-shot" id="mapShot" alt="离线地图" hidden>
             <span class="map-scale">1 km</span>
-            <span class="map-chip map-dest"><span data-icon="flag"></span><span id="mapDestChip">大鹏半岛西涌营地</span></span>
-            <span class="map-chip map-dist"><span data-icon="route"></span><span id="mapDistance">58 km</span> · <span id="mapDuration">1 小时 05 分</span></span>
+            <span class="map-chip map-dest"><span data-icon="flag"></span><span id="mapDestChip">马峦山溪谷营地</span></span>
+            <span class="map-chip map-dist"><span data-icon="route"></span><span id="mapDistance">18 km</span> · <span id="mapDuration">32 分</span></span>
             <div class="map-zoom">
               <button id="zoomIn" type="button" aria-label="放大地图"><span data-icon="plus"></span></button>
               <button id="zoomOut" type="button" aria-label="缩小地图"><span data-icon="minus"></span></button>
@@ -120,13 +120,13 @@
             <div class="search-row">
               <div class="search-box" id="searchBox">
                 <span data-icon="search"></span>
-                <input class="dest-input" id="destInput" value="大鹏半岛西涌营地" placeholder="搜索目的地 / 营地" aria-label="搜索目的地" autocomplete="off">
+                <input class="dest-input" id="destInput" value="马峦山溪谷营地" placeholder="搜索目的地 / 营地" aria-label="搜索目的地" autocomplete="off">
               </div>
               <button class="btn" id="planBtn" type="button">设定<span data-icon="arrow-up-right"></span></button>
             </div>
             <p class="field-error" id="destError"></p>
             <div class="quick-chips" id="destChips"></div>
-            <div class="plan-meta"><span data-icon="route"></span><span id="routeMeta">58 km · 1 小时 05 分 · 预计 16:15 到达</span></div>
+            <div class="plan-meta"><span data-icon="route"></span><span id="routeMeta">18 km · 32 分 · 预计 15:42 到达</span></div>
           </article>
 
           <article class="card arrival-card" id="arrivalCard">
@@ -134,25 +134,25 @@
               <div>
                 <h3>到达天气</h3>
               </div>
-              <span class="tag tag-warn" id="arrBadge">雷雨</span>
+              <span class="tag tag-info" id="arrBadge">中雨</span>
             </div>
             <div class="arrival-main">
-              <div class="arrival-temp"><span class="num-xl" id="arrTemp">18</span><span>°C</span></div>
+              <div class="arrival-temp"><span class="num-xl" id="arrTemp">25</span><span>°C</span></div>
               <div class="arrival-desc">
-                <div id="arrCond">雷阵雨</div>
-                <span id="arrArrival">预计 16:20 到达</span>
+                <div id="arrCond">中雨</div>
+                <span id="arrArrival">预计 15:42 到达</span>
               </div>
-              <div class="arrival-ic" id="arrIcon" data-icon="cloud-lightning"></div>
+              <div class="arrival-ic" id="arrIcon" data-icon="cloud-rain"></div>
             </div>
             <div class="arrival-grid">
-              <div><span>降水概率</span><b id="arrRain">80%</b></div>
-              <div><span>风速</span><b id="arrWind">15 km/h</b></div>
-              <div><span>气压</span><b id="arrPressure">1006 hPa</b></div>
-              <div><span>能见度</span><b id="arrVis">4.0 km</b></div>
+              <div><span>降水概率</span><b id="arrRain">65%</b></div>
+              <div><span>风速</span><b id="arrWind">东风 12 km/h</b></div>
+              <div><span>气压</span><b id="arrPressure">1011 hPa</b></div>
+              <div><span>能见度</span><b id="arrVis">5.5 km</b></div>
             </div>
             <div class="arrival-note">
               <span data-icon="umbrella"></span>
-              <p id="arrNote">到达前 1 小时有雷阵雨，营地地面湿滑，建议延后扎营或选择有遮蔽的营位。</p>
+              <p id="arrNote">溪谷路段有短时中雨，营地排水良好，建议携带防潮垫并优先选择高处营位。</p>
             </div>
             <div class="hourly" id="arrHourly"></div>
             <div class="arrival-loading" id="arrivalLoading" hidden>
@@ -167,23 +167,23 @@
         <div class="card-head">
           <span class="ch-ic" data-icon="leaf"></span>
           <h3>露营建议</h3>
-          <span class="ch-tag tag tag-dim" id="adviceDest">大鹏半岛西涌营地</span>
+          <span class="ch-tag tag tag-dim" id="adviceDest">马峦山溪谷营地</span>
         </div>
         <div class="advice-grid">
           <div class="advice-block">
             <div class="ab-head"><span data-icon="thermometer"></span>营地舒适度</div>
-            <div class="ab-main" id="comfortScore">58<small>/ 100 · 一般</small></div>
-            <p class="ab-text" id="comfortText">降雨影响体感，建议延后扎营或选择有遮蔽的营位。</p>
+            <div class="ab-main" id="comfortScore">66<small>/ 100 · 尚可</small></div>
+            <p class="ab-text" id="comfortText">溪谷湿度偏高，建议使用防潮垫并选择排水良好的高处营位。</p>
           </div>
           <div class="advice-block">
             <div class="ab-head"><span data-icon="umbrella"></span>装备建议</div>
             <div class="ab-chips" id="gearChips"></div>
-            <p class="ab-text">到达前 1 小时有雷阵雨，优先搭建天幕再扎帐。</p>
+            <p class="ab-text">溪谷路段有短时中雨，优先选择高处营位并做好防潮。</p>
           </div>
           <div class="advice-block">
             <div class="ab-head"><span data-icon="alert-triangle"></span>安全提示</div>
-            <div class="ab-main" id="safetyMain" style="font-size:14px">雷雨 · 阵风 5 级</div>
-            <p class="ab-text" id="safetyText">避开孤立大树与溪谷低洼营位；雷暴期间停止使用金属杆帐。</p>
+            <div class="ab-main" id="safetyMain" style="font-size:14px">中雨 · 阵风 4 级</div>
+            <p class="ab-text" id="safetyText">溪谷路段湿滑，避免在陡坡下方与河床扎营；夜间注意落石。</p>
           </div>
         </div>
       </article>

@@ -97,21 +97,22 @@ npm test          # 运行 domain 规则单测
 
 露营页「路线预览」分三层，按可用性自动接管：
 
-1. **在线高德**（配置 Key 且联网）：实时瓦片 + 路况图层 + 起终点与路线
+1. **在线高德**（配置 Key 且联网）：实时瓦片 + 路况图层 + 真实道路驾车路线
 2. **离线真实地图**（无网 / CDN 不可达）：`src/public/map/<目的地>.jpg` 真实地图快照，随目的地切换
 3. **SVG 示意地图**（快照缺失）：纯内嵌矢量兜底
 
 ```bash
 cp .env.example src/.env.local   # 本工程 vite root 为 src，env 文件必须放在 src/ 下
-# 填入 VITE_AMAP_KEY / VITE_AMAP_SECURITY_CODE
+# 填入 VITE_AMAP_KEY
 npm run dev
 ```
 
 - 无 Key、断网或 5 秒内加载失败时自动回退，不报错、不影响一屏排版
 - 使用 JS API **1.4.17**（2.0 会创建 `javascript:` iframe 触发 CSP 拦截）；两版内部都用 `new Function`，因此构建产物 CSP 放行 `'unsafe-eval'`（源码本身仍无 `eval`）
-- 路线规划 `AMap.Driving` 走 restapi，**必须配「安全密钥」**（`VITE_AMAP_SECURITY_CODE`）；未配置时自动降级为起终点标记 + 虚线估算，真实地图与路况照常显示
+- 驾车路线几何预置在 `src/data/mock.js` 各目的地的 `routePath`（OSRM 真实道路规划导出，WGS-84），上图前逐点转 GCJ-02 画实线；**不依赖 `AMap.Driving`，因此无需安全密钥**
+- 切换目的地时按路线包围盒重新居中缩放，起终点标记随路线首尾绘制
 - mock 坐标为 WGS-84，上图前由 [geo.js](file:///workspace/car-weather-system/src/maps/geo.js) 转 GCJ-02
-- 离线快照由在线地图截取（`src/public/map/`），改主题或换目的地后重新截图即可
+- 离线快照由在线地图截取（`src/public/map/`），已包含真实路线；改主题或换目的地后重新截图即可
 
 CSP 已放行 `webapi.amap.com`、`*.amap.com`、`*.autonavi.com`。
 
@@ -130,7 +131,7 @@ npm run check:dist   # 需先 npm run build
 
 - `src/data/mock.js` → `export { DB }`：所有 mock 原始读数的唯一来源
 - `src/domain/*`：纯函数规则，`rainLevelOf` / `rainAssistPlan` / `evaluateFlood` / `fishingScore` / `pressureStateOf`，以及天气展示口径 `windTextOf` / `skyOf` / `rainChanceOf` / `feelsOf` / `visibilityOf` / `pressureTrendOf`
-- `src/adapters/*`：`Sensor.readVehicleRain / readBasinGauge`、`Weather.readSeries`（真实接口）/ `readBasinForecast / readArrivalBrief / readFishingSpot`（mock）、`Amap.searchDestination / planRoute`
+- `src/adapters/*`：`Sensor.readVehicleRain / readBasinGauge`、`Weather.readSeries`（真实接口）/ `readBasinForecast / readArrivalBrief / readFishingSpot`（mock）、`Amap.searchDestination`（含 `routePath` 真实路线几何）/ `planRoute`
 - `src/api/api.js` → `export { Api }`：`getDashboard / setRainAssist / planDestination / getFloodStatus / getFishingWindow`，每个函数标注了预期的 HTTP method 与 path，接后端时只替换 adapters 实现，本层返回结构不变
 - `src/core/icons.js`：`data-icon="name"` 挂载内联 SVG，无 CDN、无字体图标
 
