@@ -9,9 +9,16 @@ const SRC = resolve(ROOT, 'src');
 const PAGES = ['index', 'rainstorm', 'camping', 'flood', 'fishing'];
 
 /* 天气接口无 CORS 头：浏览器侧通过同源代理转发，避开跨域限制。
+   /api/om → Open-Meteo（主通道），/api/tj → tjweather（备用通道）。
    若本机需经 HTTP 代理出网（HTTPS_PROXY / https_proxy），代理请求一并走该出口。 */
 const egressProxy = process.env.HTTPS_PROXY || process.env.https_proxy;
 const weatherProxy = {
+  '/api/om': {
+    target: 'https://api.open-meteo.com',
+    changeOrigin: true,
+    rewrite: (p: string) => p.replace(/^\/api\/om/, ''),
+    ...(egressProxy ? { agent: new HttpsProxyAgent(egressProxy) } : {}),
+  },
   '/api/tj': {
     target: 'https://api.tjweather.com',
     changeOrigin: true,
@@ -48,7 +55,7 @@ function productionCsp(): Plugin {
         /* 高德 JS API 内部使用 new Function，必须放行 'unsafe-eval'（仅构建产物，源码仍禁止 eval） */
         `script-src 'self' 'unsafe-eval' https://*.amap.com https://*.autonavi.com; ` +
         `font-src 'self' data: https://*.amap.com; ` +
-        `connect-src 'self' https://api.tjweather.com https://*.amap.com https://*.autonavi.com; ` +
+        `connect-src 'self' https://api.open-meteo.com https://api.tjweather.com https://*.amap.com https://*.autonavi.com; ` +
         `worker-src blob:; base-uri 'none'; form-action 'none'">`;
       return html.replace('</head>', `${meta}\n</head>`);
     },

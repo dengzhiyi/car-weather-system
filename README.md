@@ -79,19 +79,19 @@ npm test          # 运行 domain 规则单测
 
 ## 天气数据接入
 
-首页实况与未来 4 小时逐时预报取自天气服务 `https://api.tjweather.com/v2`，默认监测点为 **深圳坪山 · 比亚迪总部**（`114.355782, 22.680820`），可在 [site.js](file:///workspace/car-weather-system/src/config/site.js) 修改。
+首页实况与未来 5 小时逐时预报优先取自 **Open-Meteo**（免费开源，`https://api.open-meteo.com/v1/forecast`），主通道异常时自动回退 tjweather 备用通道；默认监测点为 **深圳坪山 · 比亚迪总部**（`114.355782, 22.680820`），可在 [site.js](file:///workspace/car-weather-system/src/config/site.js) 修改。
 
 | 项 | 说明 |
 |---|---|
-| 授权要素 | `wd10m` 风向、`ws10m` 风速、`t2m` 温度、`rh2m` 湿度、`psz` 气压、`tp` 降水 |
-| 取数粒度 | `t_res=15min`，`fcst_days=10`，`tz=8` |
-| 单位换算 | `psz` 由 Pa 换算为 hPa；`ws10m` 保持 m/s，展示时换算 km/h |
-| 缓存 | 适配层内存缓存 5 分钟，避免每次进页重复拉取 10 天数据 |
-| 跨域 | 接口无 CORS 头，浏览器侧统一走同源代理 `/api/tj/*` → `https://api.tjweather.com/*`（见 `vite.config.ts` 的 `weatherProxy`）；Capacitor Native 环境直连服务端 |
-| 降级 | 代理不可用 / 订阅异常时自动退回 `src/data/mock.js`，看板结构不变、不报错 |
-| 实时性 | 返回序列起点并不等于当前时刻，实况与逐时基准均取「距当前最近的时间点」；首页更新时间秒级跟随系统时钟，看板每分钟重渲染一次，天气数据受 5 分钟缓存保护，不会额外请求接口 |
+| 主通道 | Open-Meteo：`minutely_15` 取温度 / 湿度 / 体感温度 / 降水 / 降水概率 / 云量 / 能见度 / 天气码 / 昼夜 / 风速风向（15 分钟粒度），`hourly` 取 `pressure_msl` 按小时对齐；`timezone=Asia/Shanghai`、`wind_speed_unit=ms` |
+| 备用通道 | tjweather：`wd10m` 风向、`ws10m` 风速、`t2m` 温度、`rh2m` 湿度、`psz` 气压、`tp` 降水（`t_res=15min`，`tz=8`） |
+| 单位换算 | Open-Meteo 的 15 分钟累计降水换算为 mm/h；tjweather 的 `psz` 由 Pa 换算为 hPa；风速统一 m/s，展示时换算 km/h |
+| 缓存 | 适配层内存缓存 5 分钟，避免每次进页重复拉取 |
+| 跨域 | Open-Meteo 支持 CORS，但仍统一走同源代理 `/api/om/*` → `https://api.open-meteo.com/*`；tjweather 无 CORS 头走 `/api/tj/*`（见 `vite.config.ts` 的 `weatherProxy`）；Capacitor Native 环境直连服务端 |
+| 降级 | 主通道异常 → tjweather 备用；两者都不可用时退回 `src/data/mock.js`，看板结构不变、不报错 |
+| 实时性 | 序列起点并不等于当前时刻，实况取「距当前最近的时间点」；未来 5 小时各档时刻按系统时钟 +1h ~ +5h 推算并向上对齐到半小时整点（`:00` / `:30`）；首页更新时间秒级跟随系统时钟，看板每分钟重渲染一次，天气数据受 5 分钟缓存保护，不会额外请求接口 |
 
-要素只有 6 个，云量、体感温度、能见度、降水概率不在订阅范围内，因此由 [weather.view.js](file:///workspace/car-weather-system/src/domain/weather.view.js) 按经验口径换算（风向→八方位、风速→蒲福风级、降水强度→天气现象/概率、湿度与降水→能见度、气压 24h 变化→趋势），仅用于展示，不参与任何预警判定。
+云量、体感温度、能见度、降水概率、天气现象与昼夜图标一律取 Open-Meteo 接口原值（`weather_code` / `cloud_cover` / `apparent_temperature` / `visibility` / `precipitation_probability` / `is_day`），仅在备用通道 tjweather 缺字段时，才由 [weather.view.js](file:///workspace/car-weather-system/src/domain/weather.view.js) 按经验口径兜底（风向→八方位、风速→蒲福风级、降水强度→天气现象/概率、湿度与降水→能见度、气压 24h 变化→趋势）；这些换算仅用于展示，不参与任何预警判定。
 
 > 订阅 key 目前写在适配层内，仅用于原型。正式部署时应由后端代理转发并保管密钥。
 

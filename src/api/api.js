@@ -14,6 +14,7 @@ import { rainAssistPlan } from '../domain/rainstorm.rules.js';
 import { fishingScore } from '../domain/fishing.rules.js';
 import {
   windTextOf,
+  skyOfCode,
   skyOf,
   rainChanceOf,
   feelsOf,
@@ -86,20 +87,49 @@ function currentPoint(series) {
   return pointAt(series, Math.min(last.at, Math.max(first.at, Date.now())));
 }
 
+/* 单个数据点 → 展示要素：接口原值优先（天气码 / 云量 / 降水概率 / 体感 / 能见度），
+   缺字段时（tjweather 备用通道）才退回 domain 里的经验口径 */
+function skyAt(point) {
+  const byCode = Number.isFinite(point.weatherCode) ? skyOfCode(point.weatherCode, point.isDay) : null;
+  if (byCode) return byCode;
+  if (Number.isFinite(point.cloudCover) && !(Number(point.rainRate) >= 0.1)) {
+    if (point.cloudCover >= 88) return { condition: '阴', icon: 'cloud' };
+    if (point.cloudCover >= 50) return { condition: '多云', icon: 'cloud-sun' };
+    if (point.cloudCover >= 20) return { condition: '晴间多云', icon: 'cloud-sun' };
+    return { condition: '晴', icon: point.isDay === 0 ? 'moon' : 'sun' };
+  }
+  return skyOf(point.rainRate, point.humidity);
+}
+
+function chanceAt(point) {
+  return Number.isFinite(point.rainChance) ? Math.round(point.rainChance) : rainChanceOf(point.rainRate);
+}
+
+function feelsAt(point) {
+  return Number.isFinite(point.apparentTemp)
+    ? Math.round(point.apparentTemp)
+    : feelsOf(point.temp, point.humidity, point.windSpeed);
+}
+
+function visibilityAt(point) {
+  if (Number.isFinite(point.visibilityKm)) return Math.round(point.visibilityKm * 10) / 10;
+  return visibilityOf(point.humidity, point.rainRate);
+}
+
 /* 实况点 → 看板天气对象（展示口径换算见 domain/weather.view.js） */
 function describeWeather(series, site) {
   const now = currentPoint(series);
   const dayLater = pointAt(series, now.at + 24 * 60 * 60 * 1000);
-  const sky = skyOf(now.rainRate, now.humidity);
+  const sky = skyAt(now);
   return {
     location: site.name,
     temp: Math.round(now.temp),
-    feels: feelsOf(now.temp, now.humidity, now.windSpeed),
+    feels: feelsAt(now),
     condition: sky.condition,
     icon: sky.icon,
-    rainChance: rainChanceOf(now.rainRate),
+    rainChance: chanceAt(now),
     humidity: Math.round(now.humidity),
-    visibility: visibilityOf(now.humidity, now.rainRate),
+    visibility: visibilityAt(now),
     wind: windTextOf(now.windDeg, now.windSpeed),
     windSpeed: Math.round(now.windSpeed * 3.6),
     pressure: Math.round(now.pressure),
@@ -108,53 +138,60 @@ function describeWeather(series, site) {
   };
 }
 
-/* 逐时预报的时刻一律按系统时钟推算（数据点取距该时刻最近的一档），
+/* 时刻对齐到半小时整点（:00 / :30），不足半小时向上取整 */
+function halfHourAt(ms) {
+  const step = 30 * 60 * 1000;
+  return Math.ceil(ms / step) * step;
+}
+
+/* 逐时预报的时刻一律按系统时钟推算并对齐半小时（数据点取距该时刻最近的一档），
    避免接口序列起点较早时，页面时间停在固定档位随不了系统时间 */
 function describeHourly(series) {
   const nowAt = Date.now();
   return HOURLY_OFFSETS.map(function (offset) {
-    const point = pointAt(series, nowAt + offset * 60 * 1000);
-    const sky = skyOf(point.rainRate, point.humidity);
+    const slotAt = offset === 0 ? nowAt : halfHourAt(nowAt + offset * 60 * 1000);
+    const point = pointAt(series, slotAt);
+    const sky = skyAt(point);
     return {
-      time: clockOf(nowAt + offset * 60 * 1000),
+      time: clockOf(slotAt),
       label: offset === 0 ? '现在' : offset / 60 + ' 小时后',
       temp: Math.round(point.temp),
       icon: sky.icon,
-      rain: rainChanceOf(point.rainRate),
+      rain: chanceAt(point),
       wind: Math.round(point.windSpeed * 3.6)
     };
   });
 }
 
-/* 兜底快照没有时间戳偏移，按数组序号（每小时一档）对齐系统时钟 */
+/* 兜底快照没有时间戳偏移，按数组序号（每小时一档）对齐系统时钟与半小时整点 */
 function withClockTimes(forecast) {
   const nowAt = Date.now();
   return forecast.map(function (f, i) {
     const offset = typeof f.offset === 'number' ? f.offset : i * 60;
-    return Object.assign({}, f, { offset: offset, time: clockOf(nowAt + offset * 60 * 1000) });
+    const slotAt = offset === 0 ? nowAt : halfHourAt(nowAt + offset * 60 * 1000);
+    return Object.assign({}, f, { offset: offset, time: clockOf(slotAt) });
   });
 }
 
 /* 目的地到达时段天气：取距到达时刻最近的一点，逐时按到达后 0/1/2 小时 */
 function arrivalWeatherOf(series, arrivalAt) {
   const point = pointAt(series, arrivalAt);
-  const sky = skyOf(point.rainRate, point.humidity);
+  const sky = skyAt(point);
   return {
     temp: Math.round(point.temp),
     condition: sky.condition,
     icon: sky.icon,
-    rainChance: rainChanceOf(point.rainRate),
+    rainChance: chanceAt(point),
     wind: windTextOf(point.windDeg, point.windSpeed),
     pressure: Math.round(point.pressure),
-    visibility: visibilityOf(point.humidity, point.rainRate) + ' km',
+    visibility: visibilityAt(point) + ' km',
     hourly: ARRIVAL_OFFSETS.map(function (offset) {
       const p = pointAt(series, arrivalAt + offset * 60 * 1000);
-      const s = skyOf(p.rainRate, p.humidity);
       return {
         offset: offset,
         temp: Math.round(p.temp),
-        icon: s.icon,
-        rain: rainChanceOf(p.rainRate)
+        icon: skyAt(p).icon,
+        rain: chanceAt(p)
       };
     })
   };

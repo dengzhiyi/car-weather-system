@@ -1,14 +1,46 @@
 /**
  * 天气要素 → 界面展示口径的换算规则（纯函数）
- * 天气接口只提供 wd10m / ws10m / t2m / rh2m / psz / tp 六要素，
- * 云量、体感温度、能见度、降水概率不在订阅范围内，这里按经验口径近似，
- * 仅用于展示，不参与任何预警判定。
+ * 云量 / 体感温度 / 能见度 / 降水概率 / 天气现象优先取接口原值（Open-Meteo 直接提供），
+ * 仅在接口缺字段（如 tjweather 备用通道）时，才用这里按经验口径近似；
+ * 展示用，不参与任何预警判定。
  */
 
 const WIND_DIRECTIONS = ['北风', '东北风', '东风', '东南风', '南风', '西南风', '西风', '西北风'];
 
 /* 蒲福风级上限（按 10 米风速 m/s） */
 const BEAUFORT_LIMITS = [0.3, 1.6, 3.4, 5.5, 8.0, 10.8, 13.9, 17.2, 20.8, 24.5, 28.5, 32.7];
+
+/* WMO 天气码 → 天气现象 + 图标（夜间把太阳类图标换成月亮/云） */
+const WMO_SKY = {
+  0: ['晴', 'sun'],
+  1: ['晴间多云', 'cloud-sun'],
+  2: ['多云', 'cloud-sun'],
+  3: ['阴', 'cloud'],
+  45: ['雾', 'cloud'],
+  48: ['雾凇', 'cloud'],
+  51: ['毛毛雨', 'cloud-drizzle'],
+  53: ['毛毛雨', 'cloud-drizzle'],
+  55: ['浓毛毛雨', 'cloud-drizzle'],
+  56: ['冻毛毛雨', 'cloud-drizzle'],
+  57: ['强冻毛毛雨', 'cloud-drizzle'],
+  61: ['小雨', 'cloud-rain'],
+  63: ['中雨', 'cloud-rain'],
+  65: ['大雨', 'cloud-rain'],
+  66: ['冻雨', 'cloud-rain'],
+  67: ['强冻雨', 'cloud-rain'],
+  71: ['小雪', 'cloud-rain'],
+  73: ['中雪', 'cloud-rain'],
+  75: ['大雪', 'cloud-rain'],
+  77: ['米雪', 'cloud-rain'],
+  80: ['阵雨', 'cloud-rain'],
+  81: ['强阵雨', 'cloud-rain'],
+  82: ['暴雨', 'cloud-rain'],
+  85: ['阵雪', 'cloud-rain'],
+  86: ['强阵雪', 'cloud-rain'],
+  95: ['雷阵雨', 'cloud-lightning'],
+  96: ['雷雨伴冰雹', 'cloud-lightning'],
+  99: ['强雷雨伴冰雹', 'cloud-lightning']
+};
 
 /* 风向角 → 八方位名称 */
 function windDirectionOf(deg) {
@@ -28,6 +60,19 @@ function windLevelOf(speed) {
 /* 风况文案：东南风 3 级 */
 function windTextOf(deg, speed) {
   return windDirectionOf(deg) + ' ' + windLevelOf(speed) + ' 级';
+}
+
+/* WMO 天气码 → 天气现象与图标（接口原值优先用这个，夜间自动换月亮 / 云） */
+function skyOfCode(code, isDay) {
+  const item = WMO_SKY[Number(code)];
+  if (!item) return null;
+  const night = isDay === 0 || isDay === false;
+  let icon = item[1];
+  if (night) {
+    if (icon === 'sun') icon = 'moon';
+    else if (icon === 'cloud-sun') icon = 'cloud';
+  }
+  return { condition: item[0], icon: icon };
 }
 
 /* 降水强度 → 天气现象与图标（无云量要素，按降水强度近似） */
@@ -116,6 +161,7 @@ export {
   windDirectionOf,
   windLevelOf,
   windTextOf,
+  skyOfCode,
   skyOf,
   rainChanceOf,
   feelsOf,

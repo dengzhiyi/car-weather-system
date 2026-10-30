@@ -56,10 +56,10 @@
   color: rgba(255,255,255,.88); font-size: var(--fs-2xs); white-space: nowrap;
 }
 .sys-loc svg { width: 15px; height: 15px; opacity: .85; }
+/* 时间与右侧日期保持同一字号与字重（仅保留等宽数字，避免秒数跳动时宽度抖动） */
 .sys-clock {
-  font-family: var(--display); font-size: var(--fs-base); font-weight: 700;
-  letter-spacing: .5px; color: #fff; font-variant-numeric: tabular-nums;
-  text-shadow: 0 1px 8px rgba(0,0,0,.4);
+  font-family: var(--display); font-size: var(--fs-2xs); font-weight: 400;
+  letter-spacing: 0; color: rgba(255,255,255,.72); font-variant-numeric: tabular-nums;
 }
 .sys-date { font-family: var(--display); font-size: var(--fs-2xs); color: rgba(255,255,255,.72); white-space: nowrap; }
 .sys-radio { display: inline-flex; align-items: center; gap: 7px; color: rgba(255,255,255,.78); }
