@@ -28,7 +28,7 @@
 │  ├─ index.html  rainstorm.html  camping.html  flood.html  fishing.html
 │  ├─ shell/   rail.html  topbar.html          # App Shell 片段（构建时注入）
 │  ├─ core/    dom.js  app.js  icons.js        # 通用工具 / 全局引导 / 内联 SVG 字典
-│  ├─ config/  site.js                         # 默认监测点（经纬度）
+│  ├─ config/  site.js  model-contract.json    # 默认监测点 / 模型契约镜像
 │  ├─ domain/  rain.js  rainstorm.rules.js  flood.rules.js  fishing.rules.js  weather.view.js
 │  ├─ adapters/ sensor.js  weather.js  amap.js  # 外部数据源隔离层
 │  ├─ maps/    amap.js  geo.js                 # 高德 JS API 挂载 / WGS-84→GCJ-02
@@ -37,8 +37,8 @@
 │  ├─ pages/   index.js  rainstorm.js  camping.js  flood.js  fishing.js
 │  ├─ styles/  tokens.css → base.css → components.css → pages.css / main.css
 │  └─ public/  icon.svg  manifest.webmanifest  map/*.jpg  # 离线真实地图快照
-├─ tests/      rainstorm / flood / fishing / weather.view / weather.series
-├─ scripts/    check-dist.mjs                  # 构建产物自检
+├─ tests/      rainstorm / flood / fishing / weather.view / weather.series / model.contract
+├─ scripts/    check-dist.mjs  check-model-contract.mjs  # 产物自检 / 契约漂移校验
 ├─ dist/                                       # 构建产物（git 忽略）
 └─ .github/workflows/ci.yml
 ```
@@ -83,7 +83,8 @@ npm test          # 运行 domain 规则单测
 
 | 项 | 说明 |
 |---|---|
-| 主通道 | Open-Meteo：`minutely_15` 取温度 / 湿度 / 体感温度 / 降水 / 降水概率 / 云量 / 能见度 / 天气码 / 昼夜 / 风速风向（15 分钟粒度），`hourly` 取 `pressure_msl` 按小时对齐；`timezone=Asia/Shanghai`、`wind_speed_unit=ms` |
+| 主通道 | Open-Meteo：`minutely_15` 取温度 / 湿度 / 体感温度 / 降水 / 降水概率 / 云量 / 能见度 / 天气码 / 昼夜 / 风速风向（15 分钟粒度）；`hourly` 取契约要求的 16 个决策字段（温度 / 湿度 / 露点 / 降水 / 降水概率 / 气压 / 海平面气压 / 风速 / 阵风 / 风向 / 云量 / 短波辐射 / UV / CAPE / 土壤湿度 / 能见度）；`timezone=Asia/Shanghai`、`wind_speed_unit=ms` |
+| 决策序列 | `Weather.readDecisionSeries(site)` 输出模型契约原名、Open-Meteo 原始单位、UTC 时间戳，与展示序列分开：展示用 mm/15min 与 km，模型输入保持 mm、m/s、m |
 | 备用通道 | tjweather：`wd10m` 风向、`ws10m` 风速、`t2m` 温度、`rh2m` 湿度、`psz` 气压、`tp` 降水（`t_res=15min`，`tz=8`） |
 | 单位换算 | Open-Meteo 的 15 分钟累计降水换算为 mm/h；tjweather 的 `psz` 由 Pa 换算为 hPa；风速统一 m/s，展示时换算 km/h |
 | 缓存 | 适配层内存缓存 5 分钟，避免每次进页重复拉取 |
@@ -121,11 +122,14 @@ CSP 已放行 `webapi.amap.com`、`*.amap.com`、`*.autonavi.com`。
 ## 校验
 
 ```bash
-npm test             # domain 纯规则单测（57 例）
-npm run check:dist   # 需先 npm run build
+npm test               # domain 规则 + 适配层 + 模型契约单测（65 例）
+npm run check:dist     # 需先 npm run build
+npm run check:contract # 与模型仓 contract.json 比对，模型仓缺失时跳过
 ```
 
-`npm test` 覆盖雨量等级边界、暴雨辅助开关两态与四级策略、山洪双规则判定与风险分、钓鱼评分单调性与评级分界、天气要素展示口径换算，以及天气适配层的字段单位归一化与接口失败降级。
+`npm test` 覆盖雨量等级边界、暴雨辅助开关两态与四级策略、山洪双规则判定与风险分、钓鱼评分单调性与评级分界、天气要素展示口径换算，以及天气适配层的字段单位归一化与接口失败降级；`model.contract.test.js` 额外锁定模型契约的 16 个逐时字段、单位、时区、`null` 处理与传感器行映射。
+
+`npm run check:contract` 见「模型契约」一节。
 
 `npm run check:dist` 检查项：产物页面齐全、5 页 App Shell 逐字节一致（含片段注入残留检测）、`data-page` 标识、资源引用有效性、CSP 已注入且无内联脚本/外链、样式与脚本产物引用。
 
@@ -136,6 +140,21 @@ npm run check:dist   # 需先 npm run build
 - `src/adapters/*`：`Sensor.readVehicleRain / readBasinGauge`、`Weather.readSeries`（真实接口，首页与露营到达天气共用）/ `readBasinForecast / readArrivalBrief / readFishingSpot`（mock；`readArrivalBrief` 只提供舒适度/装备/安全文案与兜底要素，到达时刻的天气由 api 层按目的地经纬度取真实序列计算）、`Amap.searchDestination`（含 `routePath` 真实路线几何）/ `planRoute`
 - `src/api/api.js` → `export { Api }`：`getDashboard / setRainAssist / planDestination / getFloodStatus / getFishingWindow`，每个函数标注了预期的 HTTP method 与 path，接后端时只替换 adapters 实现，本层返回结构不变
 - `src/core/icons.js`：`data-icon="name"` 挂载内联 SVG，无 CDN、无字体图标
+- `src/config/model-contract.json`：模型输入契约镜像，字段 / 单位 / 参数以模型仓 `contract.json` 为准，由 `npm run check:contract` 校验漂移
+- `Weather.readDecisionSeries` / `Sensor.toModelRow`：模型输入边界；当前无页面调用，接入前不影响现有 UI
+
+## 模型契约（car_weather_model）
+
+`car_weather_model` 是待接入的决策模型仓库。当前只完成**输入契约与数据准备**，页面尚未消费模型结果；系统仓不依赖模型仓即可 `dev / build / test`。
+
+- 契约镜像：[model-contract.json](file:///workspace/car-weather-system/src/config/model-contract.json) 逐字同步模型仓的 `contract.json`（`schemaVersion` 1.0.0），包含：
+  - 16 个逐时字段的名称、单位、合理区间与请求窗口（过去 1 天 / 未来 3 天）
+  - 传感器 8 列（`time / mode / t_c / rh_pct / p_sta_hpa / rain_mm / lux / speed_kmh`）及 QC 量程
+  - 时间口径：内部 UTC、展示与传感器日志 `+08:00`
+  - 决策参数与临界雨量（默认停留时长、48h 视界、OI 权重、默认阈值等）
+- 决策序列：[weather.js](file:///workspace/car-weather-system/src/adapters/weather.js#L272-L274) 的 `Weather.readDecisionSeries(site)` 输出**模型字段原名 + Open-Meteo 原始单位 + UTC 时间戳**；展示序列仍走 `minutely_15`，两套口径不混用。
+- 传感器行：[sensor.js](file:///workspace/car-weather-system/src/adapters/sensor.js#L42-L53) 的 `Sensor.toModelRow(reading)` 把内部读数映射为契约行，缺失值保持 `null`，时间固定 `+08:00`，交由模型侧 QC。真实 5 传感器数据仍需 Capacitor 原生插件（CAN / OBD / 车机 SDK）。
+- 跨仓校验：[check-model-contract.mjs](file:///workspace/car-weather-system/scripts/check-model-contract.mjs) 对比本地镜像与 `../car_weather_model/contract.json`，可用 `MODEL_CONTRACT=/path/to/contract.json` 指定路径。一致输出 `[contract] ok`；漂移时列出差异键并以退出码 1 失败；模型仓未检出时输出 skip 并以退出码 0 跳过，不阻塞独立构建。
 
 ## 兼容性
 

@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check:dist": "node scripts/check-dist.mjs"
+    "check:dist": "node scripts/check-dist.mjs",
+    "check:contract": "node scripts/check-model-contract.mjs"
   },
   "devDependencies": {
     "https-proxy-agent": "^9.1.0",

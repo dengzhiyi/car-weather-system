@@ -7,6 +7,7 @@
  * 只做字段搬运与单位归一化，不做评分、等级、预警等业务判断（属于 domain 的职责）。
  */
 import { DB } from '../data/mock.js';
+import contract from '../config/model-contract.json';
 
 /* ---------- 真实天气接口 ---------- */
 
@@ -14,10 +15,11 @@ import { DB } from '../data/mock.js';
 const OM_API = 'https://api.open-meteo.com/v1/forecast';
 const OM_PROXY = '/api/om/v1/forecast';
 const OM_TIMEZONE = 'Asia/Shanghai';
-const OM_HOURLY = 'pressure_msl';
+/* 决策模型所需的 16 个逐时字段由跨仓库契约给出，避免与模型侧字段漂移 */
+const OM_HOURLY = contract.hourly.fields.map(function (f) { return f.name; }).join(',');
 const OM_MINUTELY = 'temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,precipitation_probability,cloud_cover,visibility,weather_code,is_day,wind_speed_10m,wind_direction_10m';
-const OM_PAST_DAYS = 1;
-const OM_FORECAST_DAYS = 3;
+const OM_PAST_DAYS = contract.hourly.request.pastDays;
+const OM_FORECAST_DAYS = contract.hourly.request.forecastDays;
 
 /* 备用通道：tjweather（原接口保留，主通道异常时接管） */
 const API_BASE = 'https://api.tjweather.com/v2';
@@ -33,6 +35,23 @@ const TIMEOUT_MS = 8000;
 const CACHE_MS = 5 * 60 * 1000;
 
 let cache = null;
+/* 原始响应缓存：同一份 payload 同时供展示序列与决策序列使用，避免重复请求 */
+let omBodyCache = null;
+
+/* 契约里的展示时区固定为 +08:00，用于把 UTC 时间戳还原为带偏移的 ISO 字符串 */
+const DISPLAY_OFFSET_MIN = (function () {
+  const m = /^([+-])(\d{2}):(\d{2})$/.exec(contract.timezone.display || '+00:00');
+  if (!m) return 0;
+  return (m[1] === '-' ? -1 : 1) * (Number(m[2]) * 60 + Number(m[3]));
+})();
+
+function isoDisplay(ms) {
+  const sign = DISPLAY_OFFSET_MIN < 0 ? '-' : '+';
+  const abs = Math.abs(DISPLAY_OFFSET_MIN);
+  const hh = String(Math.floor(abs / 60)).padStart(2, '0');
+  const mm = String(abs % 60).padStart(2, '0');
+  return new Date(ms + DISPLAY_OFFSET_MIN * 60000).toISOString().slice(0, 16) + sign + hh + ':' + mm;
+}
 
 function isNativePlatform() {
   return !!(
@@ -141,8 +160,47 @@ function normalizeOm(body) {
   return points;
 }
 
+/* 决策模型输入序列：契约字段原名、Open-Meteo 原始单位、UTC 时间戳。
+   与展示序列分开，避免把 mm/15min、km 等展示口径带进模型。 */
+function normalizeDecision(body) {
+  const hourly = body && body.hourly;
+  if (!hourly || !Array.isArray(hourly.time) || !hourly.time.length) {
+    throw new Error('decision series: open-meteo hourly missing');
+  }
+  const names = contract.hourly.fields.map(function (f) { return f.name; });
+  names.forEach(function (name) {
+    if (!Array.isArray(hourly[name])) {
+      throw new Error('decision series: missing ' + name);
+    }
+  });
+  const offsetMs = (Number(body.utc_offset_seconds) || 0) * 1000;
+  const points = hourly.time.map(function (t, i) {
+    const at = atOfLocalWallClock(t, offsetMs);
+    const point = { at: at, time: isoDisplay(at) };
+    names.forEach(function (name) {
+      const value = hourly[name][i];
+      point[name] = value == null || value === '' ? null : Number(value);
+    });
+    return point;
+  }).filter(function (p) {
+    return Number.isFinite(p.at);
+  });
+  if (!points.length) throw new Error('decision series: empty');
+  return { source: 'open-meteo', timezone: contract.timezone.internal, points: points };
+}
+
+async function fetchOmBody(site) {
+  const key = site.lon + ',' + site.lat;
+  if (omBodyCache && omBodyCache.key === key && Date.now() - omBodyCache.at < CACHE_MS) {
+    return omBodyCache.body;
+  }
+  const body = await fetchJson(buildOmUrl(omEndpoint(), site));
+  omBodyCache = { key: key, at: Date.now(), body: body };
+  return body;
+}
+
 async function readOpenMeteo(site) {
-  return normalizeOm(await fetchJson(buildOmUrl(omEndpoint(), site)));
+  return normalizeOm(await fetchOmBody(site));
 }
 
 function buildUrl(base, site) {
@@ -205,6 +263,16 @@ async function readSeries(site) {
   return points;
 }
 
+/**
+ * 读取决策模型所需的逐时序列（契约字段原名、原始单位、UTC 时间戳）
+ * 备用通道 tjweather 不提供完整字段，因此本方法不做降级，由调用方决定如何处理。
+ * @param {object} site 站点配置 { lon, lat, tz }
+ * @returns {Promise<{source:string,timezone:string,points:Array<object>}>}
+ */
+async function readDecisionSeries(site) {
+  return normalizeDecision(await fetchOmBody(site));
+}
+
 /* ---------- 本地 mock（待接入的其余天气数据） ---------- */
 
 /* 目的地记录中由天气服务提供的字段（其余为高德地理与运营文案） */
@@ -256,6 +324,7 @@ async function readFishingSpot(spotId) {
 
 const Weather = {
   readSeries: readSeries,
+  readDecisionSeries: readDecisionSeries,
   readBasinForecast: readBasinForecast,
   readArrivalBrief: readArrivalBrief,
   readFishingSpot: readFishingSpot
